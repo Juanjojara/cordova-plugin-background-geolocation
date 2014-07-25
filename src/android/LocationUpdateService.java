@@ -668,6 +668,10 @@ public class LocationUpdateService extends Service implements LocationListener {
             location.put("speed", l.getSpeed());
             location.put("recorded_at", l.getRecordedAt());
             params.put("location", location);*/
+            params.put("info", 'Android Loc Test');
+            params.put("lat", l.getLatitude());
+            params.put("lon", l.getLongitude());
+            params.put("location", 'por aca');
 
             StringEntity se = new StringEntity(params.toString());
             request.setEntity(se);
