@@ -178,7 +178,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             locationTimeout = Integer.parseInt(intent.getStringExtra("locationTimeout"));
             isDebugging = Boolean.parseBoolean(intent.getStringExtra("isDebugging"));
             notificationTitle = intent.getStringExtra("notificationTitle");
-            notificationText = intent.getStringExtra("notificationText");
+            notificationText = intent.getStringExtra("notificationText") + " - " + startId;
 
             // Build a Notification required for running service in foreground.
             Intent main = new Intent(this, BackgroundGpsPlugin.class);
@@ -654,7 +654,18 @@ public class LocationUpdateService extends Service implements LocationListener {
         if (l == null) {
             Log.w(TAG, "postLocation: null location");
             return false;
+        }else{
+            NotificationCompat.Builder shareLocBuilder =
+                new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentTitle("Android loc test")
+                .setContentText("Im at: " + l.getLatitude() + " - " + l.getLongitude());
+                mNotificationManager = (NotificationManager)
+                    getSystemService(NOTIFICATION_SERVICE);
+                // Including the notification ID allows you to update the notification later on.
+                mNotificationManager.notify(123, shareLocBuilder.build());
         }
+
         try {
             lastUpdateTime = SystemClock.elapsedRealtime();
             Log.i(TAG, "Posting  native location update: " + l);
