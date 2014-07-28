@@ -660,11 +660,11 @@ public class LocationUpdateService extends Service implements LocationListener {
             shareLocBuilder.setContentText("Im at: " + l.getLatitude() + " - " + l.getLongitude());
             shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
             //shareLocBuilder.setContentIntent(pendingIntent);
-            /*Notification shareNotification;
+            Notification shareNotification;
             if (android.os.Build.VERSION.SDK_INT >= 16) {
-                shareNotification = buildForegroundNotification(builder);
+                shareNotification = buildForegroundNotification(shareLocBuilder);
             } else {
-                shareNotification = buildForegroundNotificationCompat(builder);
+                shareNotification = buildForegroundNotificationCompat(shareLocBuilder);
             }
             shareNotification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
 
@@ -672,7 +672,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                     getSystemService(NOTIFICATION_SERVICE);
                 // Including the notification ID allows you to update the notification later on.
             mNotificationManager.notify(123, shareNotification);
-            */
+            
         }
 
         try {
