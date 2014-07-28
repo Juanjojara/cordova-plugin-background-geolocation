@@ -655,12 +655,12 @@ public class LocationUpdateService extends Service implements LocationListener {
             Log.w(TAG, "postLocation: null location");
             return false;
         }else{
-            /*Notification.Builder shareLocBuilder = new Notification.Builder(this);
+            Notification.Builder shareLocBuilder = new Notification.Builder(this);
             shareLocBuilder.setContentTitle("Android loc test");
             shareLocBuilder.setContentText("Im at: " + l.getLatitude() + " - " + l.getLongitude());
-            shareLocBuilder.setSmallIcon(R.drawable.notification_icon);
+            shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
             //shareLocBuilder.setContentIntent(pendingIntent);
-            Notification shareNotification;
+            /*Notification shareNotification;
             if (android.os.Build.VERSION.SDK_INT >= 16) {
                 shareNotification = buildForegroundNotification(builder);
             } else {
