@@ -655,7 +655,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             Log.w(TAG, "postLocation: null location");
             return false;
         }else{
-            Notification.Builder shareLocBuilder = new Notification.Builder(this);
+            /*Notification.Builder shareLocBuilder = new Notification.Builder(this);
             shareLocBuilder.setContentTitle("Android loc test");
             shareLocBuilder.setContentText("Im at: " + l.getLatitude() + " - " + l.getLongitude());
             shareLocBuilder.setSmallIcon(R.drawable.notification_icon);
@@ -672,6 +672,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                     getSystemService(NOTIFICATION_SERVICE);
                 // Including the notification ID allows you to update the notification later on.
             mNotificationManager.notify(123, shareNotification);
+            */
         }
 
         try {
