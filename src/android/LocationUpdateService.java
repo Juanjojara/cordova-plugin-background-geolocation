@@ -701,16 +701,16 @@ public class LocationUpdateService extends Service implements LocationListener {
 
             Iterator<String> headkeys = headers.keys();
             while( headkeys.hasNext() ){
-		String headkey = headkeys.next();
-		if(headkey != null) {
-            		Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
-            		request.setHeader(headkey, (String)headers.getString(headkey));
-		}
+                String headkey = headkeys.next();
+                if(headkey != null) {
+                    Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
+                    request.setHeader(headkey, (String)headers.getString(headkey));
+                }
             }
             Log.d(TAG, "Posting to " + request.getURI().toString());
             HttpResponse response = httpClient.execute(request);
             Log.i(TAG, "Response received: " + response.getStatusLine());
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if ((response.getStatusLine().getStatusCode() == 200) || (response.getStatusLine().getStatusCode() == 204)) {
                 return true;
             } else {
                 return false;
