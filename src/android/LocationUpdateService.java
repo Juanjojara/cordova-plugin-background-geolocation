@@ -655,15 +655,23 @@ public class LocationUpdateService extends Service implements LocationListener {
             Log.w(TAG, "postLocation: null location");
             return false;
         }else{
-            NotificationCompat.Builder shareLocBuilder =
-                new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.notification_icon)
-                .setContentTitle("Android loc test")
-                .setContentText("Im at: " + l.getLatitude() + " - " + l.getLongitude());
-                mNotificationManager = (NotificationManager)
+            Notification.Builder shareLocBuilder = new Notification.Builder(this);
+            shareLocBuilder.setContentTitle("Android loc test");
+            shareLocBuilder.setContentText("Im at: " + l.getLatitude() + " - " + l.getLongitude());
+            shareLocBuilder.setSmallIcon(R.drawable.notification_icon);
+            //shareLocBuilder.setContentIntent(pendingIntent);
+            Notification shareNotification;
+            if (android.os.Build.VERSION.SDK_INT >= 16) {
+                shareNotification = buildForegroundNotification(builder);
+            } else {
+                shareNotification = buildForegroundNotificationCompat(builder);
+            }
+            shareNotification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
+
+            NotificationManager mNotificationManager = (NotificationManager)
                     getSystemService(NOTIFICATION_SERVICE);
                 // Including the notification ID allows you to update the notification later on.
-                mNotificationManager.notify(123, shareLocBuilder.build());
+            mNotificationManager.notify(123, shareNotification);
         }
 
         try {
