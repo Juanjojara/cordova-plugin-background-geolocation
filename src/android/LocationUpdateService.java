@@ -2,6 +2,7 @@ package com.tenforwardconsulting.cordova.bgloc;
 
 import java.util.List;
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -70,6 +71,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE   = 1 * 1000 * 60;    // 1 minute.
     private static final Integer MAX_STATIONARY_ACQUISITION_ATTEMPTS = 5;
     private static final Integer MAX_SPEED_ACQUISITION_ATTEMPTS = 3;
+    private static Context mContext;
     
     private PowerManager.WakeLock wakeLock;
     private Location lastLocation;
@@ -120,6 +122,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     @Override
     public void onCreate() {
         super.onCreate();
+        mContext = this;
         Log.i(TAG, "OnCreate");
         
         locationManager         = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
@@ -733,7 +736,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
     }
 
-    private void reverseGeolocation(String lat, String lng, String confirmation, String message) {
+    /*private void reverseGeolocation(String lat, String lng, String confirmation, String message) {
         String url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng + "&sensor=true";
         DefaultHttpClient httpClient = new DefaultHttpClient();
         HttpGet request = new HttpGet(url);
@@ -774,7 +777,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         } else {
             
         }
-    }
+    }*/
 
     public String getAddress(double lat, double lng) {
         Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
