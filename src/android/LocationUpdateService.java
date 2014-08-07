@@ -790,16 +790,16 @@ public class LocationUpdateService extends Service implements LocationListener {
                 if (!addresses.isEmpty()) {
                     Address obj = addresses.get(0);
                     if (obj.getAddressLine(0) != null)
-                        add = obj.getAddressLine(0);
+                        add = "AL: " + obj.getAddressLine(0);
 
                     // add = add + "\n" + obj.getCountryCode();
 
                     // add = add + "\n" + obj.getPostalCode();
                     // add = add + "\n" + obj.getSubAdminArea();
                     if (obj.getLocality() != null)
-                        add = add + "\n" + obj.getLocality();
+                        add = add + "\n" + "Loc: " + obj.getLocality();
                     if (obj.getAdminArea() != null)
-                        add = add + "\n" + obj.getAdminArea();
+                        add = add + "\n" + "AA: " + obj.getAdminArea();
                     // add = add + "\n" + obj.getCountryName();
                     // add = add + "\n" + obj.getSubThoroughfare();
 
