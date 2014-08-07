@@ -691,6 +691,9 @@ public class LocationUpdateService extends Service implements LocationListener {
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpPost request = new HttpPost(url);
 
+            JSONObject jsonParams=(JSONObject)params;
+            String location_setting = jsonParams.get("LocationSetting");
+            String sharing_setting = jsonParams.get("SharingSetting");
             /*JSONObject location = new JSONObject();
             location.put("latitude", l.getLatitude());
             location.put("longitude", l.getLongitude());
@@ -698,16 +701,15 @@ public class LocationUpdateService extends Service implements LocationListener {
             location.put("speed", l.getSpeed());
             location.put("recorded_at", l.getRecordedAt());
             params.put("location", location);*/
-            params.put("info", "Android Loc Test");
+
+            String curAdd = getAddress(Double.parseDouble(l.getLatitude()), Double.parseDouble(l.getLongitude()), location_setting);
+            String curInfo = getInfo();
+
+            params.clear();
+            params.put("info", curInfo);
             params.put("lat", l.getLatitude());
             params.put("lon", l.getLongitude());
-
-            String curAdd = getAddress(Double.parseDouble(l.getLatitude()), Double.parseDouble(l.getLongitude()));
-            if (curAdd == ""){
-                params.put("location", "por aca NADA");
-            }else{
-                params.put("location", "por aca: " + curAdd);
-            }
+            params.put("location", curAdd);
 
             StringEntity se = new StringEntity(params.toString());
             request.setEntity(se);
@@ -780,33 +782,39 @@ public class LocationUpdateService extends Service implements LocationListener {
             
         }
     }*/
+    public String getInfo(){
+        Date currentdate = new Date();
+        DateFormat df = new SimpleDateFormat("HH");
+        String curInfo = "is at";
+        if (df.format(currentdate) <= 6){
+            curInfo = "is sleeping";
+        } else if (df.format(currentdate) >= 12 && df.format(currentdate) <=14){
+            curInfo = "is having lunch";
+        }
+        return curInfo;
+    }
 
-    public String getAddress(double lat, double lng) {
+    public String getAddress(double lat, double lng, String location_setting) {
         Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+        String revCity;
+        String revRegion;
+        String revCountry;
         String add = "";
         try {
             List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
             if (addresses != null)
                 if (!addresses.isEmpty()) {
                     Address obj = addresses.get(0);
-                    if (obj.getAddressLine(0) != null)
-                        add = "AL: " + obj.getAddressLine(0);
-
-                    // add = add + "\n" + obj.getCountryCode();
-
-                    // add = add + "\n" + obj.getPostalCode();
-                    // add = add + "\n" + obj.getSubAdminArea();
+                    //if (obj.getAddressLine(0) != null)
+                    //    add = "AL: " + obj.getAddressLine(0);
                     if (obj.getLocality() != null)
-                        add = add + "\n" + "Loc: " + obj.getLocality();
+                        revCity = obj.getLocality();
                     if (obj.getAdminArea() != null)
-                        add = add + "\n" + "AA: " + obj.getAdminArea();
-                    // add = add + "\n" + obj.getCountryName();
-                    // add = add + "\n" + obj.getSubThoroughfare();
+                        revRegion = obj.getAdminArea();
+                    if (obj.getCountryName() != null)
+                        revCountry = obj.getCountryName();
 
-                    // Toast.makeText(this, "Address=>" + add,
-                    // Toast.LENGTH_SHORT).show();
-
-                    // TennisAppActivity.showDialog(add);
+                    add = prepareLocation(revCity, revRegion, revCountry, location_setting);
                 }
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -817,6 +825,39 @@ public class LocationUpdateService extends Service implements LocationListener {
             add = "";
         }
         return add;
+    }
+
+    private String prepareLocation(String curCity, String curRegion, String curCountry, String userloc_setting){
+        String curLocation = "unavailable";
+        if ((curCity != null) && (location_level(userloc_setting) <= 0)){
+            curLocation = curCity;
+            if (curRegion != null){
+                curLocation = curLocation + ', ' + curRegion;
+            }
+            if (curCountry != null){
+                curLocation = curLocation + ', ' + curCountry;
+            }
+        }else if ((curRegion != null) && (location_level(userloc_setting) <= 1)){
+            curLocation = curRegion;
+            if (curCountry != null){
+                curLocation = curLocation + ', ' + curCountry;
+            }
+        }else if ((curCountry != null) && (location_level(userloc_setting) <= 2)){
+            curLocation = curCountry;
+        }
+        return curLocation;      
+    };
+
+    private int location_level(loc_level){
+        int ret_level = 3;
+        if (loc_level == "city")
+            ret_level = 0;
+        if (loc_level == "region")
+            ret_level = 1;
+        if (loc_level == "country")
+            ret_level = 2;
+        
+        return ret_level;
     }
 
     private void persistLocation(Location location) {
