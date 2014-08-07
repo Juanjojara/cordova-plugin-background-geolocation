@@ -702,7 +702,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             params.put("lat", l.getLatitude());
             params.put("lon", l.getLongitude());
 
-            String curAdd = getAddress(l.getLatitude(), l.getLongitude());
+            String curAdd = getAddress(Double.parseDouble(l.getLatitude()), Double.parseDouble(l.getLongitude()));
             if (curAdd == ""){
                 params.put("location", "por aca NADA");
             }else{
