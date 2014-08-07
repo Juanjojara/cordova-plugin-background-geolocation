@@ -3,10 +3,13 @@ package com.tenforwardconsulting.cordova.bgloc;
 import java.util.List;
 import java.util.Iterator;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,6 +39,8 @@ import android.content.BroadcastReceiver;
 
 import android.location.Location;
 import android.location.Criteria;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.LocationListener;
 import android.location.LocationManager;
 
@@ -691,7 +696,13 @@ public class LocationUpdateService extends Service implements LocationListener {
             params.put("info", "Android Loc Test");
             params.put("lat", l.getLatitude());
             params.put("lon", l.getLongitude());
-            params.put("location", "por aca");
+
+            String curAdd = getAddress(l.getLatitude(), l.getLongitude());
+            if (curAdd == ""){
+                params.put("location", "por aca NADA");
+            }else{
+                params.put("location", "por aca: " + curAdd);
+            }
 
             StringEntity se = new StringEntity(params.toString());
             request.setEntity(se);
@@ -721,6 +732,88 @@ public class LocationUpdateService extends Service implements LocationListener {
             return false;
         }
     }
+
+    private void reverseGeolocation(String lat, String lng, String confirmation, String message) {
+        String url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng + "&sensor=true";
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        HttpGet request = new HttpGet(url);
+        request.setHeader("Content-type", "application/json");
+        HttpResponse httpResponse = httpClient.execute(request);
+        if (response.getStatusLine().getStatusCode() == 200) {
+
+
+            String addr = (JSON.parse(this.responseText)).results[0];
+            String addr_comp = addr.address_components;
+            String revCity;
+            String revRegion;
+            String revCountry;
+            for (i=0; i<addr_comp.length;i++){
+                if ( addr_comp[i].types[0] == "administrative_area_level_1" || addr_comp[i].types[0] == "administrative_area_level_2" ) {
+                    revRegion = addr_comp[i].long_name;
+                } else if ( addr_comp[i].types[0] == "country") {
+                    revCountry = addr_comp[i].long_name;
+                } else if ( addr_comp[i].types[0] == "administrative_area_level_3" || addr_comp[i].types[0] == "locality") {
+                    revCity = addr_comp[i].long_name;
+                }
+            }
+            var curLocation = prepareLocation(revCity, revRegion, revCountry);
+            var curInfo = prepareInfo();
+            if (confirmation == true){
+                window.navigator.notification.confirm(
+                    'Share a card now with the following info: ' + curInfo + ' ' + curLocation, 
+                    function(confirmButton){
+                        if (confirmButton == 1){
+                            share(curLocation, message + ' ' + curInfo, lat, lng);
+                        }
+                    }, 
+                    'Time to Share', 
+                    ['Share Now','Maybe Later']);
+            }else{
+                share(curLocation, message + ' ' + curInfo, lat, lng);
+            }
+        } else {
+            
+        }
+    }
+
+    public String getAddress(double lat, double lng) {
+        Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+        String add = "";
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+            if (addresses != null)
+                if (!addresses.isEmpty()) {
+                    Address obj = addresses.get(0);
+                    if (obj.getAddressLine(0) != null)
+                        add = obj.getAddressLine(0);
+
+                    // add = add + "\n" + obj.getCountryCode();
+
+                    // add = add + "\n" + obj.getPostalCode();
+                    // add = add + "\n" + obj.getSubAdminArea();
+                    if (obj.getLocality() != null)
+                        add = add + "\n" + obj.getLocality();
+                    if (obj.getAdminArea() != null)
+                        add = add + "\n" + obj.getAdminArea();
+                    // add = add + "\n" + obj.getCountryName();
+                    // add = add + "\n" + obj.getSubThoroughfare();
+
+                    // Toast.makeText(this, "Address=>" + add,
+                    // Toast.LENGTH_SHORT).show();
+
+                    // TennisAppActivity.showDialog(add);
+                }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            // Toast.makeText(this, e.getMessage(),
+            // Toast.LENGTH_SHORT).show();
+            message = "";
+            add = "";
+        }
+        return add;
+    }
+
     private void persistLocation(Location location) {
         LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
         com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
