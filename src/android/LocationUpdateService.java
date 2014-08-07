@@ -782,7 +782,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             
         }
     }*/
-    public String getInfo(){
+    private String getInfo(){
         Date currentdate = new Date();
         DateFormat df = new SimpleDateFormat("HH");
         String curInfo = "is at";
@@ -794,7 +794,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         return curInfo;
     }
 
-    public String getAddress(double lat, double lng, String location_setting) {
+    private String getAddress(double lat, double lng, String location_setting) {
         Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
         String revCity;
         String revRegion;
@@ -848,7 +848,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         return curLocation;      
     };
 
-    private int location_level(loc_level){
+    private int location_level(String loc_level){
         int ret_level = 3;
         if (loc_level == "city")
             ret_level = 0;
