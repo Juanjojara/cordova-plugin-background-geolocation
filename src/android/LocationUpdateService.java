@@ -1,5 +1,6 @@
 package com.tenforwardconsulting.cordova.bgloc;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Locale;
@@ -72,6 +73,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private static final Integer MAX_STATIONARY_ACQUISITION_ATTEMPTS = 5;
     private static final Integer MAX_SPEED_ACQUISITION_ATTEMPTS = 3;
     private static Context mContext;
+    private static String message;
     
     private PowerManager.WakeLock wakeLock;
     private Location lastLocation;
