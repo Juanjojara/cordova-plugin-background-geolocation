@@ -832,15 +832,15 @@ public class LocationUpdateService extends Service implements LocationListener {
         if ((curCity != null) && (location_level(userloc_setting) <= 0)){
             curLocation = curCity;
             if (curRegion != null){
-                curLocation = curLocation + ', ' + curRegion;
+                curLocation = curLocation + ", " + curRegion;
             }
             if (curCountry != null){
-                curLocation = curLocation + ', ' + curCountry;
+                curLocation = curLocation + ", " + curCountry;
             }
         }else if ((curRegion != null) && (location_level(userloc_setting) <= 1)){
             curLocation = curRegion;
             if (curCountry != null){
-                curLocation = curLocation + ', ' + curCountry;
+                curLocation = curLocation + ", " + curCountry;
             }
         }else if ((curCountry != null) && (location_level(userloc_setting) <= 2)){
             curLocation = curCountry;
