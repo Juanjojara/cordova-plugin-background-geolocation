@@ -806,9 +806,9 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     private String getAddress(double lat, double lng, String location_setting) {
         Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
-        String revCity;
-        String revRegion;
-        String revCountry;
+        String revCity = null;
+        String revRegion =  null;
+        String revCountry = null;
         String add = "";
         try {
             List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
