@@ -796,9 +796,9 @@ public class LocationUpdateService extends Service implements LocationListener {
         Date currentdate = new Date();
         DateFormat df = new SimpleDateFormat("HH");
         String curInfo = "is at";
-        if (parseInt(df.format(currentdate)) <= 6){
+        if (Integer.parseInt(df.format(currentdate)) <= 6){
             curInfo = "is sleeping";
-        } else if (parseInt(df.format(currentdate)) >= 12 && parseInt(df.format(currentdate)) <=14){
+        } else if (Integer.parseInt(df.format(currentdate)) >= 12 && Integer.parseInt(df.format(currentdate)) <=14){
             curInfo = "is having lunch";
         }
         return curInfo;
