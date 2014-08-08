@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Locale;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -714,7 +715,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             String curAdd = getAddress(Double.parseDouble(l.getLatitude()), Double.parseDouble(l.getLongitude()), location_setting);
             String curInfo = getInfo();
 
-            params.clear();
+            //params.clear();
             params.put("info", curInfo);
             params.put("lat", l.getLatitude());
             params.put("lon", l.getLongitude());
