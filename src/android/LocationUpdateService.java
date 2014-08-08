@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Locale;
+import java.text.DateFormat;
+import java.util.Date;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -691,7 +693,8 @@ public class LocationUpdateService extends Service implements LocationListener {
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpPost request = new HttpPost(url);
 
-            JSONObject jsonParams=(JSONObject)params;
+            Object objParams=JSONValue.parse(params);
+            JSONObject jsonParams=(JSONObject)objParams;
             String location_setting = jsonParams.get("LocationSetting");
             String sharing_setting = jsonParams.get("SharingSetting");
             /*JSONObject location = new JSONObject();
