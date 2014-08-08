@@ -838,7 +838,8 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private String prepareLocation(String curCity, String curRegion, String curCountry, String userloc_setting){
-        String curLocation = "unavailable. City: " + curCity + ". Reg: " + curRegion + ". Coun: " + curCountry + ". Sets: " + userloc_setting;
+        int loc_level = location_level(userloc_setting);
+        String curLocation = "unavailable. City: " + curCity + ". Reg: " + curRegion + ". Coun: " + curCountry + ". Sets: " + loc_level;
         if ((curCity != null) && (location_level(userloc_setting) <= 0)){
             curLocation = curCity;
             if (curRegion != null){
@@ -860,11 +861,11 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     private int location_level(String loc_level){
         int ret_level = 3;
-        if (loc_level == "city")
+        if (loc_level.equals("city"))
             ret_level = 0;
-        if (loc_level == "region")
+        if (loc_level.equals("region"))
             ret_level = 1;
-        if (loc_level == "country")
+        if (loc_level.equals("country"))
             ret_level = 2;
         
         return ret_level;
