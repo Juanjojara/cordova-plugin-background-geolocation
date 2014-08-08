@@ -838,7 +838,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private String prepareLocation(String curCity, String curRegion, String curCountry, String userloc_setting){
-        String curLocation = "unavailable";
+        String curLocation = "unavailable. City: " + curCity + ". Reg: " + curRegion + ". Coun: " + curCountry + ". Sets: " + userloc_setting;
         if ((curCity != null) && (location_level(userloc_setting) <= 0)){
             curLocation = curCity;
             if (curRegion != null){
