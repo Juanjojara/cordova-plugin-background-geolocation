@@ -783,7 +783,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         } catch (IOException e) {
             e.printStackTrace();
             message = "";
-            add = "";
+            add = "Error during reverse geocoding. " + e.message;
         }
         return add;
     }
