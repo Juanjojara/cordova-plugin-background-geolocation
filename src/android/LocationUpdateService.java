@@ -687,11 +687,13 @@ public class LocationUpdateService extends Service implements LocationListener {
                 params.put("location", location);*/
 
                 String curAdd = getAddress(Double.parseDouble(l.getLatitude()), Double.parseDouble(l.getLongitude()), location_setting);
+                if (curAdd == null)
+                    return false;
                 String curInfo = getInfo();
 
-                //if (sharing_setting.equals("confirm")){
-                //    postNotification(curInfo, curAdd);
-                //}
+                if (sharing_setting.equals("confirm")){
+                    postNotification(curInfo, curAdd);
+                }
 
                 params.put("info", curInfo);
                 params.put("lat", l.getLatitude());
@@ -782,8 +784,8 @@ public class LocationUpdateService extends Service implements LocationListener {
                 }
         } catch (IOException e) {
             e.printStackTrace();
-            message = "";
-            add = "Error during reverse geocoding. " + e.getMessage();
+            message = "Error during reverse geocoding. " + e.getMessage();
+            add = null;
         }
         return add;
     }
