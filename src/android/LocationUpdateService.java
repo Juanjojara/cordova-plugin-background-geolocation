@@ -41,6 +41,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 
 import android.location.Location;
 import android.location.Criteria;
@@ -674,27 +676,38 @@ public class LocationUpdateService extends Service implements LocationListener {
                 DefaultHttpClient httpClient = new DefaultHttpClient();
                 HttpPost request = new HttpPost(url);
 
+                //Get user settings for creating and sharing a card
                 String location_setting = params.getString("LocationSetting");
                 String sharing_setting = params.getString("SharingSetting");
                 params.remove("LocationSetting");
                 params.remove("SharingSetting");
-                /*JSONObject location = new JSONObject();
-                location.put("latitude", l.getLatitude());
-                location.put("longitude", l.getLongitude());
-                location.put("accuracy", l.getAccuracy());
-                location.put("speed", l.getSpeed());
-                location.put("recorded_at", l.getRecordedAt());
-                params.put("location", location);*/
 
                 String curAdd = getAddress(Double.parseDouble(l.getLatitude()), Double.parseDouble(l.getLongitude()), location_setting);
-                if (curAdd == null)
-                    return false;
+                if (curAdd == null){
+                    postNotification("Error", "Please reset your device and start the application again");
+                    return false;                    
+                }
                 String curInfo = getInfo();
 
+                //Control to avoid creating redundant cards
+                SharedPreferences pref = mContext.getSharedPreferences("org.lifeshare.young", Context.MODE_PRIVATE);
+                String lastAdd = pref.getString("lastAddress", "");
+                String lastInfo = pref.getString("lastInfo", "");
+                if (curAdd.equals(lastAdd) && curInfo.equals(lastInfo)){
+                    return true;
+                }else{
+                    SharedPreferences.Editor edit = pref.edit();
+                    edit.putString("lastAddress", curAdd);
+                    edit.putString("lastInfo", curInfo);
+                    edit.commit();
+                }
+
+                //Create a notification if necessary
                 if (sharing_setting.equals("confirm")){
                     postNotification(curInfo, curAdd);
                 }
 
+                //Proces for creating the card on the server
                 params.put("info", curInfo);
                 params.put("lat", l.getLatitude());
                 params.put("lon", l.getLongitude());
