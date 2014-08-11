@@ -668,86 +668,82 @@ public class LocationUpdateService extends Service implements LocationListener {
             Log.w(TAG, "postLocation: null location");
             return false;
         }else{
-            Notification.Builder shareLocBuilder = new Notification.Builder(this);
-            shareLocBuilder.setContentTitle("Android loc test");
-            shareLocBuilder.setContentText("Im at: " + l.getLatitude() + " - " + l.getLongitude());
-            shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
-            //shareLocBuilder.setContentIntent(pendingIntent);
-            Notification shareNotification;
-            if (android.os.Build.VERSION.SDK_INT >= 16) {
-                shareNotification = buildForegroundNotification(shareLocBuilder);
-            } else {
-                shareNotification = buildForegroundNotificationCompat(shareLocBuilder);
-            }
-            shareNotification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
+            try {
+                lastUpdateTime = SystemClock.elapsedRealtime();
+                Log.i(TAG, "Posting  native location update: " + l);
+                DefaultHttpClient httpClient = new DefaultHttpClient();
+                HttpPost request = new HttpPost(url);
 
-            NotificationManager mNotificationManager = (NotificationManager)
-                    getSystemService(NOTIFICATION_SERVICE);
-                // Including the notification ID allows you to update the notification later on.
-            mNotificationManager.notify(123, shareNotification);
-            
-        }
+                String location_setting = params.getString("LocationSetting");
+                String sharing_setting = params.getString("SharingSetting");
+                params.remove("LocationSetting");
+                params.remove("SharingSetting");
+                /*JSONObject location = new JSONObject();
+                location.put("latitude", l.getLatitude());
+                location.put("longitude", l.getLongitude());
+                location.put("accuracy", l.getAccuracy());
+                location.put("speed", l.getSpeed());
+                location.put("recorded_at", l.getRecordedAt());
+                params.put("location", location);*/
 
-        try {
-            lastUpdateTime = SystemClock.elapsedRealtime();
-            Log.i(TAG, "Posting  native location update: " + l);
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpPost request = new HttpPost(url);
+                String curAdd = getAddress(Double.parseDouble(l.getLatitude()), Double.parseDouble(l.getLongitude()), location_setting);
+                String curInfo = getInfo();
 
-            
-            
-
-
-            //Object objParams=JSONValue.parse(params);
-            //JSONObject jsonParams=(JSONObject)objParams;
-            String location_setting = params.getString("LocationSetting");
-            String sharing_setting = params.getString("SharingSetting");
-            params.remove("LocationSetting");
-            params.remove("SharingSetting");
-            /*JSONObject location = new JSONObject();
-            location.put("latitude", l.getLatitude());
-            location.put("longitude", l.getLongitude());
-            location.put("accuracy", l.getAccuracy());
-            location.put("speed", l.getSpeed());
-            location.put("recorded_at", l.getRecordedAt());
-            params.put("location", location);*/
-
-            String curAdd = getAddress(Double.parseDouble(l.getLatitude()), Double.parseDouble(l.getLongitude()), location_setting);
-            String curInfo = getInfo();
-
-            //params.clear();
-            params.put("info", curInfo);
-            params.put("lat", l.getLatitude());
-            params.put("lon", l.getLongitude());
-            params.put("location", curAdd);
-
-            StringEntity se = new StringEntity(params.toString());
-            request.setEntity(se);
-            //request.setHeader("Accept", "application/json");
-            request.setHeader("Content-type", "application/json");
-            //request.setHeader("Authorization", "application/json");
-
-            Iterator<String> headkeys = headers.keys();
-            while( headkeys.hasNext() ){
-                String headkey = headkeys.next();
-                if(headkey != null) {
-                    Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
-                    request.setHeader(headkey, (String)headers.getString(headkey));
+                if (sharing_setting.equals("confirm")){
+                    postNotification(curInfo, curAdd);
                 }
-            }
-            Log.d(TAG, "Posting to " + request.getURI().toString());
-            HttpResponse response = httpClient.execute(request);
-            Log.i(TAG, "Response received: " + response.getStatusLine());
-            if ((response.getStatusLine().getStatusCode() == 200) || (response.getStatusLine().getStatusCode() == 204)) {
-                return true;
-            } else {
+
+                params.put("info", curInfo);
+                params.put("lat", l.getLatitude());
+                params.put("lon", l.getLongitude());
+                params.put("location", curAdd);
+
+                StringEntity se = new StringEntity(params.toString());
+                request.setEntity(se);
+                request.setHeader("Content-type", "application/json");
+
+                Iterator<String> headkeys = headers.keys();
+                while( headkeys.hasNext() ){
+                    String headkey = headkeys.next();
+                    if(headkey != null) {
+                        Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
+                        request.setHeader(headkey, (String)headers.getString(headkey));
+                    }
+                }
+                Log.d(TAG, "Posting to " + request.getURI().toString());
+                HttpResponse response = httpClient.execute(request);
+                Log.i(TAG, "Response received: " + response.getStatusLine());
+                if ((response.getStatusLine().getStatusCode() == 200) || (response.getStatusLine().getStatusCode() == 204)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Throwable e) {
+                Log.w(TAG, "Exception posting location: " + e);
+                e.printStackTrace();
                 return false;
             }
-        } catch (Throwable e) {
-            Log.w(TAG, "Exception posting location: " + e);
-            e.printStackTrace();
-            return false;
         }
+    }
+
+    private void postNotification(String info, String loc){
+        Notification.Builder shareLocBuilder = new Notification.Builder(this);
+        shareLocBuilder.setContentTitle("Lifeshare");
+        shareLocBuilder.setContentText(info + " " + loc);
+        shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
+        //shareLocBuilder.setContentIntent(pendingIntent);
+        Notification shareNotification;
+        if (android.os.Build.VERSION.SDK_INT >= 16) {
+            shareNotification = buildForegroundNotification(shareLocBuilder);
+        } else {
+            shareNotification = buildForegroundNotificationCompat(shareLocBuilder);
+        }
+        shareNotification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
+
+        NotificationManager mNotificationManager = (NotificationManager)
+                getSystemService(NOTIFICATION_SERVICE);
+            // Including the notification ID allows you to update the notification later on.
+        mNotificationManager.notify(123, shareNotification);
     }
 
     /*private void reverseGeolocation(String lat, String lng, String confirmation, String message) {
@@ -827,10 +823,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                     add = prepareLocation(revCity, revRegion, revCountry, location_setting);
                 }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
-            // Toast.makeText(this, e.getMessage(),
-            // Toast.LENGTH_SHORT).show();
             message = "";
             add = "";
         }
