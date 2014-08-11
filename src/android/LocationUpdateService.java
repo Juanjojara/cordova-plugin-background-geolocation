@@ -746,48 +746,6 @@ public class LocationUpdateService extends Service implements LocationListener {
         mNotificationManager.notify(123, shareNotification);
     }
 
-    /*private void reverseGeolocation(String lat, String lng, String confirmation, String message) {
-        String url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng + "&sensor=true";
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-        HttpGet request = new HttpGet(url);
-        request.setHeader("Content-type", "application/json");
-        HttpResponse httpResponse = httpClient.execute(request);
-        if (response.getStatusLine().getStatusCode() == 200) {
-
-
-            String addr = (JSON.parse(this.responseText)).results[0];
-            String addr_comp = addr.address_components;
-            String revCity;
-            String revRegion;
-            String revCountry;
-            for (i=0; i<addr_comp.length;i++){
-                if ( addr_comp[i].types[0] == "administrative_area_level_1" || addr_comp[i].types[0] == "administrative_area_level_2" ) {
-                    revRegion = addr_comp[i].long_name;
-                } else if ( addr_comp[i].types[0] == "country") {
-                    revCountry = addr_comp[i].long_name;
-                } else if ( addr_comp[i].types[0] == "administrative_area_level_3" || addr_comp[i].types[0] == "locality") {
-                    revCity = addr_comp[i].long_name;
-                }
-            }
-            var curLocation = prepareLocation(revCity, revRegion, revCountry);
-            var curInfo = prepareInfo();
-            if (confirmation == true){
-                window.navigator.notification.confirm(
-                    'Share a card now with the following info: ' + curInfo + ' ' + curLocation, 
-                    function(confirmButton){
-                        if (confirmButton == 1){
-                            share(curLocation, message + ' ' + curInfo, lat, lng);
-                        }
-                    }, 
-                    'Time to Share', 
-                    ['Share Now','Maybe Later']);
-            }else{
-                share(curLocation, message + ' ' + curInfo, lat, lng);
-            }
-        } else {
-            
-        }
-    }*/
     private String getInfo(){
         Date currentdate = new Date();
         DateFormat df = new SimpleDateFormat("HH");
@@ -805,7 +763,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         String revCity = null;
         String revRegion =  null;
         String revCountry = null;
-        String add = "";
+        String add = "unavailable";
         try {
             List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
             if (addresses != null)
