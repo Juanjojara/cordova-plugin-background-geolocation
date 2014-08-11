@@ -689,9 +689,9 @@ public class LocationUpdateService extends Service implements LocationListener {
                 String curAdd = getAddress(Double.parseDouble(l.getLatitude()), Double.parseDouble(l.getLongitude()), location_setting);
                 String curInfo = getInfo();
 
-                if (sharing_setting.equals("confirm")){
-                    postNotification(curInfo, curAdd);
-                }
+                //if (sharing_setting.equals("confirm")){
+                //    postNotification(curInfo, curAdd);
+                //}
 
                 params.put("info", curInfo);
                 params.put("lat", l.getLatitude());
