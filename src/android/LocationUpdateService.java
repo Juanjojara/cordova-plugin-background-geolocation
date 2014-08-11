@@ -193,7 +193,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             locationTimeout = Integer.parseInt(intent.getStringExtra("locationTimeout"));
             isDebugging = Boolean.parseBoolean(intent.getStringExtra("isDebugging"));
             notificationTitle = intent.getStringExtra("notificationTitle");
-            notificationText = intent.getStringExtra("notificationText") + " - " + startId;
+            notificationText = intent.getStringExtra("notificationText");
 
             // Build a Notification required for running service in foreground.
             Intent main = new Intent(this, BackgroundGpsPlugin.class);
