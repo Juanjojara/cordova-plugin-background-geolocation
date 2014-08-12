@@ -694,6 +694,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                 String lastAdd = pref.getString("lastAddress", "");
                 String lastInfo = pref.getString("lastInfo", "");
                 if (curAdd.equals(lastAdd) && curInfo.equals(lastInfo)){
+                    postNotification(curInfo, curAdd + " (Not shared)");
                     return true;
                 }else{
                     SharedPreferences.Editor edit = pref.edit();
