@@ -43,6 +43,7 @@ import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.preference.PreferenceManager;
 
 import android.location.Location;
 import android.location.Criteria;
