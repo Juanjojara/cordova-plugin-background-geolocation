@@ -680,8 +680,10 @@ public class LocationUpdateService extends Service implements LocationListener {
                 //Get user settings for creating and sharing a card
                 String location_setting = params.getString("LocationSetting");
                 String sharing_setting = params.getString("SharingSetting");
+                String user_id = params.getString("UserId")
                 params.remove("LocationSetting");
                 params.remove("SharingSetting");
+                params.remove("UserId");
 
                 String curAdd = getAddress(Double.parseDouble(l.getLatitude()), Double.parseDouble(l.getLongitude()), location_setting);
                 if (curAdd == null){
@@ -695,10 +697,11 @@ public class LocationUpdateService extends Service implements LocationListener {
                 //SharedPreferences pref = mContext.getSharedPreferences("org.lifeshare.young", Context.MODE_PRIVATE);
                 SharedPreferences.Editor edit = pref.edit();
 
+
                 String lastAdd = pref.getString("lastAddress", "");
                 String lastInfo = pref.getString("lastInfo", "");
 
-                edit.putString("testJuanjo", "Uanko");
+                edit.putString("user_id", user_id);
                 edit.commit();
                 Log.i(TAG, "saving in prefs");
                 if (curAdd.equals(lastAdd) && curInfo.equals(lastInfo)){

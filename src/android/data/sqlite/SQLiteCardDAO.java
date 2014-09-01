@@ -17,45 +17,33 @@ import com.tenforwardconsulting.cordova.bgloc.data.CardDAO;
 
 public class SQLiteCardDAO implements CardDAO {
 	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	private static final String TAG = "SQLiteLocationDAO";
+	private static final String TAG = "SQLiteCardDAO";
 	private Context context;
 	
 	public SQLiteCardDAO(Context context) {
 		this.context = context;
 	}
 	
-	/*public int getContactsCount() {
+	public void internetPendingCards() {
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+		String user_id = pref.getString("user_id", "");
         String countQuery = "SELECT count(id) countPendings FROM pending_geo WHERE user_id = ?";
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(countQuery, null);
+        Cursor cursor = db.rawQuery(countQuery, new String[]{user_id});
+        int internetCards = c.getInt(c.getColumnIndex("countPendings"))
         cursor.close();
- 
-        // return count
-        return cursor.getCount();
-    }*/
+ 		db.close();
+ 		SharedPreferences.Editor edit = pref.edit();
+ 		if (internetCards > 0){
+ 			edit.putBoolean("pendingInternet", true);
+ 		}else{
+ 			edit.putBoolean("pendingInternet", false);
+ 		}
+ 		Log.d(TAG, "RC = " + internetCards);
+ 		edit.commit();
+    }
 
-	public Card[] getInternetPendingCards() {
-		SQLiteDatabase db = null;
-		Cursor c = null;
-		List<Card> all = new ArrayList<Card>();
-		try {
-			db = new CardOpenHelper(context).getReadableDatabase();
-			c = db.query("pending_geo", null, null, null, null, null, null);
-			while (c.moveToNext()) {
-				all.add(hydrate(c));
-			}
-		} finally {
-			if (c != null) {
-				c.close();
-			}
-			if (db != null) {
-				db.close();
-			}
-		}
-		return all.toArray(new Card[all.size()]);
-	}
-
-	/*public boolean persistCard(String tableName, Card card) {
+	public boolean persistCard(String tableName, Card card) {
 		SQLiteDatabase db = new CardOpenHelper(context).getWritableDatabase();
 		db.beginTransaction();
 		ContentValues values = getContentValues(card);
@@ -70,30 +58,7 @@ public class SQLiteCardDAO implements CardDAO {
 			return false;
 		}
 	}
-	*/	
-	private Card hydrate(Cursor c) {
-		Card l = new Card();
-		//l.setId(c.getLong(c.getColumnIndex("id")));
-		//l.setRecordedAt(stringToDate(c.getString(c.getColumnIndex("recordedAt"))));
-		//l.setLatitude(c.getString(c.getColumnIndex("latitude")));
-		//l.setLongitude(c.getString(c.getColumnIndex("longitude")));
-		//l.setAccuracy(c.getString(c.getColumnIndex("accuracy")));
-		//l.setSpeed(c.getString(c.getColumnIndex("speed")));
-
-		/*l.setId(id);
-		l.setCreated(ts);
-		l.setInfo(info);
-		l.setLocation(loc);
-		l.setLongitude(lon);
-		l.setLatitude(lat);
-		l.setSharing_level(sharLEvel);
-		l.setLocation_level(locLevel);
-		l.setUser_id(userId);
-		l.setConfirm(conf);
-		*/
-		return l;
-	}
-	
+		
 	private ContentValues getContentValues(Card card) {
 		ContentValues values = new ContentValues();
 		values.put("id", card.getId());
