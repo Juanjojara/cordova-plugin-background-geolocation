@@ -73,12 +73,12 @@ public class SQLiteCardDAO implements CardDAO {
 	*/	
 	private Card hydrate(Cursor c) {
 		Card l = new Card();
-		l.setId(c.getLong(c.getColumnIndex("id")));
-		l.setRecordedAt(stringToDate(c.getString(c.getColumnIndex("recordedAt"))));
-		l.setLatitude(c.getString(c.getColumnIndex("latitude")));
-		l.setLongitude(c.getString(c.getColumnIndex("longitude")));
-		l.setAccuracy(c.getString(c.getColumnIndex("accuracy")));
-		l.setSpeed(c.getString(c.getColumnIndex("speed")));
+		//l.setId(c.getLong(c.getColumnIndex("id")));
+		//l.setRecordedAt(stringToDate(c.getString(c.getColumnIndex("recordedAt"))));
+		//l.setLatitude(c.getString(c.getColumnIndex("latitude")));
+		//l.setLongitude(c.getString(c.getColumnIndex("longitude")));
+		//l.setAccuracy(c.getString(c.getColumnIndex("accuracy")));
+		//l.setSpeed(c.getString(c.getColumnIndex("speed")));
 
 		/*l.setId(id);
 		l.setCreated(ts);
