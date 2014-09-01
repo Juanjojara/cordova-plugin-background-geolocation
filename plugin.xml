@@ -26,8 +26,12 @@
         <source-file src="src/android/data/DAOFactory.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data" />
         <source-file src="src/android/data/Location.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data" />
         <source-file src="src/android/data/LocationDAO.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data" />
+        <source-file src="src/android/data/Card.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data" />
+        <source-file src="src/android/data/CardDAO.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data" />
         <source-file src="src/android/data/sqlite/LocationOpenHelper.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />
         <source-file src="src/android/data/sqlite/SQLiteLocationDAO.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />
+        <source-file src="src/android/data/sqlite/CardOpenHelper.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />
+        <source-file src="src/android/data/sqlite/SQLiteCardDAO.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />
 
         <source-file src="src/android/notification.png" target-dir="res/drawable" />
 
