@@ -14,7 +14,7 @@ public class Card {
 	private String sharing_level;
 	private String location_level;
 	private String user_id;
-	private Bool confirm;
+	private boolean confirm;
 	
 	private int id;
 	
@@ -72,14 +72,14 @@ public class Card {
 	public void setUser_id(String user_id) {
 		this.user_id = user_id;
 	}
-	public Bool getConfirm() {
+	public boolean getConfirm() {
 		return confirm;
 	}
-	public void setConfirm(Bool confirm) {
+	public void setConfirm(boolean confirm) {
 		this.confirm = confirm;
 	}
 	
-	public static Card createCard(int ts, String info, String loc, String lat, String lon, String sharLEvel, String locLevel, String userId, Bool conf) {
+	public static Card createCard(int ts, String info, String loc, String lat, String lon, String sharLEvel, String locLevel, String userId, boolean conf) {
 		Card card = new Card();
 		card.setCreated(ts);
 		card.setInfo(info);
