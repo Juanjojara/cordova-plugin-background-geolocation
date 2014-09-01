@@ -11,8 +11,9 @@ public abstract class DAOFactory {
 		return new SQLiteLocationDAO(context);
 	}
 
-	public static CardDAO createCardDAO(Context context) {
+/*	public static CardDAO createCardDAO(Context context) {
 		//Very basic for now
 		return new SQLiteCardDAO(context);
 	}
+	*/
 }

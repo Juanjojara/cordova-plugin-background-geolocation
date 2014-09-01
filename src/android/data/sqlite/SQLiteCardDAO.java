@@ -24,7 +24,7 @@ public class SQLiteCardDAO implements CardDAO {
 		this.context = context;
 	}
 	
-	public int getContactsCount() {
+	/*public int getContactsCount() {
         String countQuery = "SELECT count(id) countPendings FROM pending_geo WHERE user_id = ?";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
@@ -32,7 +32,7 @@ public class SQLiteCardDAO implements CardDAO {
  
         // return count
         return cursor.getCount();
-    }
+    }*/
 
 	public Card[] getInternetPendingCards() {
 		SQLiteDatabase db = null;
@@ -55,7 +55,7 @@ public class SQLiteCardDAO implements CardDAO {
 		return all.toArray(new Card[all.size()]);
 	}
 
-	public boolean persistLocation(String tableName, Card card) {
+	/*public boolean persistCard(String tableName, Card card) {
 		SQLiteDatabase db = new CardOpenHelper(context).getWritableDatabase();
 		db.beginTransaction();
 		ContentValues values = getContentValues(card);
@@ -70,7 +70,7 @@ public class SQLiteCardDAO implements CardDAO {
 			return false;
 		}
 	}
-		
+	*/	
 	private Card hydrate(Cursor c) {
 		Card l = new Card();
 		l.setId(c.getLong(c.getColumnIndex("id")));
@@ -80,6 +80,7 @@ public class SQLiteCardDAO implements CardDAO {
 		l.setAccuracy(c.getString(c.getColumnIndex("accuracy")));
 		l.setSpeed(c.getString(c.getColumnIndex("speed")));
 
+		/*l.setId(id);
 		l.setCreated(ts);
 		l.setInfo(info);
 		l.setLocation(loc);
@@ -89,7 +90,7 @@ public class SQLiteCardDAO implements CardDAO {
 		l.setLocation_level(locLevel);
 		l.setUser_id(userId);
 		l.setConfirm(conf);
-		
+		*/
 		return l;
 	}
 	

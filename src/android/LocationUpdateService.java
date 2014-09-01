@@ -690,7 +690,8 @@ public class LocationUpdateService extends Service implements LocationListener {
                 String curInfo = getInfo();
 
                 //Control to avoid creating redundant cards
-                SharedPreferences pref = mContext.getSharedPreferences("org.lifeshare.young", Context.MODE_PRIVATE);
+                SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+                //SharedPreferences pref = mContext.getSharedPreferences("org.lifeshare.young", Context.MODE_PRIVATE);
                 String lastAdd = pref.getString("lastAddress", "");
                 String lastInfo = pref.getString("lastInfo", "");
                 if (curAdd.equals(lastAdd) && curInfo.equals(lastInfo)){
@@ -702,6 +703,9 @@ public class LocationUpdateService extends Service implements LocationListener {
                     edit.putString("lastInfo", curInfo);
                     edit.commit();
                 }
+                SharedPreferences.Editor edit2 = pref.edit();
+                edit2.putString("testJuanjo", "Uanko");
+                edit2.commit();
 
                 //Create a notification if necessary
                 if (sharing_setting.equals("confirm")){
