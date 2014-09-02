@@ -31,9 +31,9 @@ public class SQLiteCardDAO implements CardDAO {
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 		String user_id = pref.getString("user_id", "");
         String countQuery = "SELECT count(id) countPendings FROM pending_geo WHERE user_id = ?";
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = new CardOpenHelper(context).getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, new String[]{user_id});
-        int internetCards = c.getInt(c.getColumnIndex("countPendings"));
+        int internetCards = cursor.getInt(cursor.getColumnIndex("countPendings"));
         cursor.close();
  		db.close();
  		SharedPreferences.Editor edit = pref.edit();
