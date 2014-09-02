@@ -20,6 +20,7 @@ import org.json.JSONObject;
 
 import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
+import com.tenforwardconsulting.cordova.bgloc.data.CardDAO;
 
 import android.annotation.TargetApi;
 

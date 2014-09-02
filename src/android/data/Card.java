@@ -106,7 +106,7 @@ public class Card {
 		return card;
 	}
 
-	private int getCardId(Context context){
+	public static int getCardId(Context context){
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor edit = pref.edit();
 
