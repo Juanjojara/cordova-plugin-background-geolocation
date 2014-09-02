@@ -83,7 +83,7 @@ public class Card {
 		this.confirm = confirm;
 	}
 	
-	public static Card createCard(android.location.Location originalLocation, Context context;, String userId) {
+	public static Card createCard(android.location.Location originalLocation, Context context, String userId) {
 		Card card = new Card();
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -106,7 +106,7 @@ public class Card {
 		return card;
 	}
 
-	private int getCardId(Context context;){
+	private int getCardId(Context context){
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor edit = pref.edit();
 
