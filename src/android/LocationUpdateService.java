@@ -680,7 +680,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                 //Get user settings for creating and sharing a card
                 String location_setting = params.getString("LocationSetting");
                 String sharing_setting = params.getString("SharingSetting");
-                String user_id = params.getString("UserId")
+                String user_id = params.getString("UserId");
                 params.remove("LocationSetting");
                 params.remove("SharingSetting");
                 params.remove("UserId");

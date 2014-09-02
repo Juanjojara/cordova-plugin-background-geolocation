@@ -30,7 +30,7 @@ public class SQLiteCardDAO implements CardDAO {
         String countQuery = "SELECT count(id) countPendings FROM pending_geo WHERE user_id = ?";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, new String[]{user_id});
-        int internetCards = c.getInt(c.getColumnIndex("countPendings"))
+        int internetCards = c.getInt(c.getColumnIndex("countPendings"));
         cursor.close();
  		db.close();
  		SharedPreferences.Editor edit = pref.edit();
