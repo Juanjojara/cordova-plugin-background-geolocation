@@ -695,10 +695,8 @@ public class LocationUpdateService extends Service implements LocationListener {
                 String curInfo = getInfo();
 
                 //Control to avoid creating redundant cards
-                //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
-                //////SharedPreferences pref = mContext.getSharedPreferences("org.lifeshare.young", Context.MODE_PRIVATE);
-                //SharedPreferences.Editor edit = pref.edit();
-
+                SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+                SharedPreferences.Editor edit = pref.edit();
 
                 String lastAdd = pref.getString("lastAddress", "");
                 String lastInfo = pref.getString("lastInfo", "");
@@ -852,6 +850,7 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     private void persistLocation(Location location) {
         LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
+        CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
         com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
 
         com.tenforwardconsulting.cordova.bgloc.data.Card savedCard = com.tenforwardconsulting.cordova.bgloc.data.Card.createCard(location, mContext, params.getString("UserId"));
@@ -862,7 +861,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             Log.w(TAG, "Failed to persist location");
         }
 
-        if (dao.persistCard("pending_geo", savedCard)) {
+        if (cdao.persistCard("pending_geo", savedCard)) {
             Log.d(TAG, "Persisted Card: " + savedCard);
         } else {
             Log.w(TAG, "Failed to persist card in pending_geo table");
