@@ -2,6 +2,10 @@ package com.tenforwardconsulting.cordova.bgloc.data;
 
 import java.util.Date;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.preference.PreferenceManager;
 import android.os.SystemClock;
 
 
@@ -79,18 +83,45 @@ public class Card {
 		this.confirm = confirm;
 	}
 	
-	public static Card createCard(int ts, String info, String loc, String lat, String lon, String sharLEvel, String locLevel, String userId, boolean conf) {
+	public static Card createCard(android.location.Location originalLocation, Context context;, String userId) {
 		Card card = new Card();
-		card.setCreated(ts);
-		card.setInfo(info);
-		card.setLocation(loc);
-		card.setLongitude(lon);
-		card.setLatitude(lat);
-		card.setSharing_level(sharLEvel);
-		card.setLocation_level(locLevel);
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+		card.setId(getCardId(context));
+		card.setCreated(safeLongToInt(new Date().getTime()));
+		card.setInfo("");
+		card.setLocation("");
+		card.setLongitude(String.valueOf(originalLocation.getLongitude()));
+		card.setLatitude(String.valueOf(originalLocation.getLatitude()));
+		card.setSharing_level(pref.getString("sharing_setting", ""));
+		card.setLocation_level(pref.getString("location_setting", ""));
 		card.setUser_id(userId);
-		card.setConfirm(conf);
+
+		boolean confirmationDlg = false;
+        if (pref.getString("sharing_setting", "") != "automatic")
+        	confirmationDlg = true;
+
+		card.setConfirm(confirmationDlg);
 
 		return card;
 	}
+
+	private int getCardId(Context context;){
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor edit = pref.edit();
+
+        int cardId = pref.getInt("cardId", 1);
+        edit.putInt("cardId", cardId+1);
+        edit.commit();
+
+        return cardId;
+    }
+
+    public static int safeLongToInt(long l) {
+    if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+        throw new IllegalArgumentException
+            (l + " cannot be cast to int without changing its value.");
+    }
+    return (int) l;
+}
 }

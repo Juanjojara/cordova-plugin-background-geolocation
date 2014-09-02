@@ -687,22 +687,24 @@ public class LocationUpdateService extends Service implements LocationListener {
 
                 String curAdd = getAddress(Double.parseDouble(l.getLatitude()), Double.parseDouble(l.getLongitude()), location_setting);
                 if (curAdd == null){
-                    postNotification("Error", "Please reset your device and start the application again");
+                    if (isNetworkConnected()){
+                        postNotification("Error", "Please reset your device and start the application again");
+                    }
                     return false;                    
                 }
                 String curInfo = getInfo();
 
                 //Control to avoid creating redundant cards
-                SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
-                //SharedPreferences pref = mContext.getSharedPreferences("org.lifeshare.young", Context.MODE_PRIVATE);
-                SharedPreferences.Editor edit = pref.edit();
+                //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+                //////SharedPreferences pref = mContext.getSharedPreferences("org.lifeshare.young", Context.MODE_PRIVATE);
+                //SharedPreferences.Editor edit = pref.edit();
 
 
                 String lastAdd = pref.getString("lastAddress", "");
                 String lastInfo = pref.getString("lastInfo", "");
 
-                edit.putString("user_id", user_id);
-                edit.commit();
+                //edit.putString("user_id", user_id);
+                //edit.commit();
                 Log.i(TAG, "saving in prefs");
                 if (curAdd.equals(lastAdd) && curInfo.equals(lastInfo)){
                     Log.i(TAG, "repeated card");
@@ -797,8 +799,6 @@ public class LocationUpdateService extends Service implements LocationListener {
             if (addresses != null)
                 if (!addresses.isEmpty()) {
                     Address obj = addresses.get(0);
-                    //if (obj.getAddressLine(0) != null)
-                    //    add = "AL: " + obj.getAddressLine(0);
                     if (obj.getLocality() != null)
                         revCity = obj.getLocality();
                     if (obj.getAdminArea() != null)
@@ -854,10 +854,18 @@ public class LocationUpdateService extends Service implements LocationListener {
         LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
         com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
 
+        com.tenforwardconsulting.cordova.bgloc.data.Card savedCard = com.tenforwardconsulting.cordova.bgloc.data.Card.createCard(location, mContext, params.getString("UserId"));
+
         if (dao.persistLocation(savedLocation)) {
             Log.d(TAG, "Persisted Location: " + savedLocation);
         } else {
             Log.w(TAG, "Failed to persist location");
+        }
+
+        if (dao.persistCard("pending_geo", savedCard)) {
+            Log.d(TAG, "Persisted Card: " + savedCard);
+        } else {
+            Log.w(TAG, "Failed to persist card in pending_geo table");
         }
     }
 
