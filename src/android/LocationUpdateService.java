@@ -854,8 +854,15 @@ public class LocationUpdateService extends Service implements LocationListener {
         CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
         com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
 
-        com.tenforwardconsulting.cordova.bgloc.data.Card savedCard = com.tenforwardconsulting.cordova.bgloc.data.Card.createCard(location, mContext, params.getString("UserId"));
+        String user_id = "";
+        try{
+            user_id = params.getString("UserId");
+        } catch (Throwable e) {
+            Log.w(TAG, "Exception obtaining user Id: " + e);
+            e.printStackTrace();
+        }
 
+        com.tenforwardconsulting.cordova.bgloc.data.Card savedCard = com.tenforwardconsulting.cordova.bgloc.data.Card.createCard(location, mContext, user_id);
         if (dao.persistLocation(savedLocation)) {
             Log.d(TAG, "Persisted Location: " + savedLocation);
         } else {
