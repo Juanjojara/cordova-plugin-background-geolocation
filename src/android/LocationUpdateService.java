@@ -852,13 +852,10 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private void persistLocation(Location location) {
-        Log.i(TAG, "2222 Persist Location");
         LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
-        Log.i(TAG, "3333 Persist Location");
         CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
-        Log.i(TAG, "4444 Persist Location");
         com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
-        Log.i(TAG, "5555 Persist Location");
+        Log.i(TAG, "2222 Persist Location");
         String user_id = "";
         try{
             user_id = params.getString("UserId");
@@ -867,19 +864,21 @@ public class LocationUpdateService extends Service implements LocationListener {
             Log.w(TAG, "Exception obtaining user Id: " + e);
             e.printStackTrace();
         }
-        Log.i(TAG, "6666 Persist Location");
+        Log.i(TAG, "3333 Persist Location");
         com.tenforwardconsulting.cordova.bgloc.data.Card savedCard = com.tenforwardconsulting.cordova.bgloc.data.Card.createCard(location, mContext, user_id);
+        Log.i(TAG, "4444 Persist Location");
         if (dao.persistLocation(savedLocation)) {
             Log.d(TAG, "Persisted Location: " + savedLocation);
         } else {
             Log.w(TAG, "Failed to persist location");
         }
-
+        Log.i(TAG, "7777 Persist Location");
         if (cdao.persistCard("pending_geo", savedCard)) {
             Log.d(TAG, "Persisted Card: " + savedCard);
         } else {
             Log.w(TAG, "Failed to persist card in pending_geo table");
         }
+        Log.i(TAG, "8888 Persist Location");
     }
 
     private boolean isNetworkConnected() {
