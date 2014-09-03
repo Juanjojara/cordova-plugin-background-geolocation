@@ -428,7 +428,9 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
         // Go ahead and cache, push to server
         lastLocation = location;
+        Log.i(TAG, "1111 Persist Location");
         persistLocation(location);
+        Log.i(TAG, "9999 Persist Location");
 
         if (this.isNetworkConnected()) {
             Log.d(TAG, "Scheduling location network post");
@@ -850,18 +852,22 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private void persistLocation(Location location) {
+        Log.i(TAG, "2222 Persist Location");
         LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
+        Log.i(TAG, "3333 Persist Location");
         CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
+        Log.i(TAG, "4444 Persist Location");
         com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
-
+        Log.i(TAG, "5555 Persist Location");
         String user_id = "";
         try{
             user_id = params.getString("UserId");
+            Log.i(TAG, "USER ID: " + user_id);
         } catch (Throwable e) {
             Log.w(TAG, "Exception obtaining user Id: " + e);
             e.printStackTrace();
         }
-
+        Log.i(TAG, "6666 Persist Location");
         com.tenforwardconsulting.cordova.bgloc.data.Card savedCard = com.tenforwardconsulting.cordova.bgloc.data.Card.createCard(location, mContext, user_id);
         if (dao.persistLocation(savedLocation)) {
             Log.d(TAG, "Persisted Location: " + savedLocation);
