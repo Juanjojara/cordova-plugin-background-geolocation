@@ -11,7 +11,7 @@ import android.util.Log;
 
 public class Card {
 	private static final String TAG = "LocationUpdateService";
-	
+
 	private int created;
 	private String info;
 	private String location;
@@ -87,12 +87,14 @@ public class Card {
 	
 	public static Card createCard(android.location.Location originalLocation, Context context, String userId) {
 		Card card = new Card();
-		Log.i(TAG, "AAAA Persist Location");
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-		Log.i(TAG, "BBBB Persist Location");
 		card.setId(getCardId(context));
+		Log.i(TAG, "AAAA Persist Location");
+		long mlsDate = new Date().getTime();
+		Log.i(TAG, "BBBB Persist Location");
+		int createdCard = safeLongToInt(mlsDate);
 		Log.i(TAG, "CCCC Persist Location");
-		card.setCreated(safeLongToInt(new Date().getTime()));
+		card.setCreated(createdCard);
 		Log.i(TAG, "DDDD Persist Location");
 		card.setInfo("");
 		card.setLocation("");
