@@ -70,32 +70,21 @@ public class SQLiteCardDAO implements CardDAO {
 	public boolean persistCard(String tableName, Card card) {
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 		String user_id = pref.getString("user_id", "");
-		Log.i(TAG, "---- Persist Location");
-        //String countQuery = "SELECT count(id) countPendings FROM shared_cards WHERE user_id = ?";
-        String countQuery = "SELECT count(id) countPendings FROM shared_cards";
+        String countQuery = "SELECT count(id) countPendings FROM shared_cards WHERE user_id = ?";
+        //String countQuery = "SELECT count(id) countPendings FROM shared_cards";
         Log.i(TAG, "USER ID: " + user_id);
         //SQLiteDatabase db = new CardOpenHelper(context).getReadableDatabase();
         SQLiteDatabase db = openDatabase("dbLifeshare.db");
-        Log.i(TAG, "AAAA Persist Location");
-        String[] queryParams = new String[1];
-        Log.i(TAG, "BBBB Persist Location");
-		queryParams[0] =user_id;
+        //String[] queryParams = new String[1];
+		//queryParams[0] =user_id;
         Log.i(TAG, "CCCC Persist Location");
-        //Cursor cursor = db.rawQuery(countQuery, null);
-		Cursor cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
-		Log.i(TAG, "COUNT: " + cursor.getCount());
-		if (cursor.moveToFirst()) {
-		    while ( !cursor.isAfterLast() ) {
-		    	Log.i(TAG, "Table Name=> " + cursor.getString(0));
-		        cursor.moveToNext();
-		    }
-		}
-        Log.i(TAG, "DDDD Persist Location");
-        //int internetCards = cursor.getInt(cursor.getColumnIndex("countPendings"));
+        Cursor cursor = db.rawQuery(countQuery, new String[]{user_id});
+		Log.i(TAG, "DDDD Persist Location");
+        int internetCards = cursor.getInt(cursor.getColumnIndex("countPendings"));
         Log.i(TAG, "EEEE Persist Location");
         cursor.close();
  		db.close();
- 		//Log.i(TAG, "RC = " + internetCards);
+ 		Log.i(TAG, "RC = " + internetCards);
 		/*SQLiteDatabase db = new CardOpenHelper(context).getWritableDatabase();
 		db.beginTransaction();
 		Log.i(TAG, "DB Open: " + db.isOpen());
