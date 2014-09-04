@@ -114,6 +114,7 @@ public class Card {
         int cardId = pref.getInt("cardId", 1);
         edit.putInt("cardId", cardId+1);
         edit.commit();
+        Log.i(TAG, "CardID serv: " + cardId + 1);
 
         return cardId;
     }
