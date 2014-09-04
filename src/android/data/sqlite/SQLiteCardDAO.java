@@ -60,14 +60,17 @@ public class SQLiteCardDAO implements CardDAO {
         Log.i(TAG, "BBBB Persist Location");
 		queryParams[0] =user_id;
         Log.i(TAG, "CCCC Persist Location");
-        //try
-		//{
-        	Cursor cursor = db.rawQuery(countQuery, null);
-        //} catch (SQLiteException e){
-        //	Log.i(TAG, "Error: " + e.error);
-        //}
+        //Cursor cursor = db.rawQuery(countQuery, null);
+		Cursor cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
+
+		if (cursor.moveToFirst()) {
+		    while ( !cursor.isAfterLast() ) {
+		    	Log.i(TAG, "Table Name=> " + cursor.getString(0));
+		        cursor.moveToNext();
+		    }
+		}
         Log.i(TAG, "DDDD Persist Location");
-        int internetCards = cursor.getInt(cursor.getColumnIndex("countPendings"));
+        //int internetCards = cursor.getInt(cursor.getColumnIndex("countPendings"));
         Log.i(TAG, "EEEE Persist Location");
         cursor.close();
  		db.close();
