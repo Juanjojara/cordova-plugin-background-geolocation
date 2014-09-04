@@ -47,7 +47,16 @@ public class SQLiteCardDAO implements CardDAO {
     }
 
 	public boolean persistCard(String tableName, Card card) {
-		SQLiteDatabase db = new CardOpenHelper(context).getWritableDatabase();
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+		String user_id = pref.getString("user_id", "");
+        String countQuery = "SELECT count(id) countPendings FROM shared_cards WHERE user_id = ?";
+        SQLiteDatabase db = new CardOpenHelper(context).getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, new String[]{user_id});
+        int internetCards = cursor.getInt(cursor.getColumnIndex("countPendings"));
+        cursor.close();
+ 		db.close();
+ 		Log.i(TAG, "RC = " + internetCards);
+		/*SQLiteDatabase db = new CardOpenHelper(context).getWritableDatabase();
 		db.beginTransaction();
 		Log.i(TAG, "DB Open: " + db.isOpen());
 		ContentValues values = getContentValues(card);
@@ -56,6 +65,8 @@ public class SQLiteCardDAO implements CardDAO {
 		db.setTransactionSuccessful();
 		db.endTransaction();
 		db.close();
+		*/
+		long rowId = -1;
 		if (rowId > -1) {
 			return true;
 		} else {
