@@ -1,5 +1,5 @@
 package com.tenforwardconsulting.cordova.bgloc.data.sqlite;
-
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
