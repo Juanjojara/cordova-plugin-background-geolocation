@@ -74,7 +74,7 @@ public class SQLiteCardDAO implements CardDAO {
         Log.i(TAG, "EEEE Persist Location");
         cursor.close();
  		db.close();
- 		Log.i(TAG, "RC = " + internetCards);
+ 		//Log.i(TAG, "RC = " + internetCards);
 		/*SQLiteDatabase db = new CardOpenHelper(context).getWritableDatabase();
 		db.beginTransaction();
 		Log.i(TAG, "DB Open: " + db.isOpen());
