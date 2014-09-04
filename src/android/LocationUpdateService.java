@@ -869,7 +869,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             e.printStackTrace();
         }
         Log.i(TAG, "3333 Persist Location");
-        com.tenforwardconsulting.cordova.bgloc.data.Card savedCard = com.tenforwardconsulting.cordova.bgloc.data.Card.createCard(location, mContext, user_id);
+        //com.tenforwardconsulting.cordova.bgloc.data.Card savedCard = com.tenforwardconsulting.cordova.bgloc.data.Card.createCard(location, mContext, user_id);
         Log.i(TAG, "4444 Persist Location");
         if (dao.persistLocation(savedLocation)) {
             Log.d(TAG, "Persisted Location: " + savedLocation);
@@ -877,11 +877,11 @@ public class LocationUpdateService extends Service implements LocationListener {
             Log.w(TAG, "Failed to persist location");
         }
         Log.i(TAG, "7777 Persist Location");
-        if (cdao.persistCard("pending_geo", savedCard)) {
+        /*if (cdao.persistCard("pending_geo", savedCard)) {
             Log.d(TAG, "Persisted Card: " + savedCard);
         } else {
             Log.w(TAG, "Failed to persist card in pending_geo table");
-        }
+        }*/
         Log.i(TAG, "8888 Persist Location");
     }
 

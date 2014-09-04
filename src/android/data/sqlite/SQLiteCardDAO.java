@@ -62,7 +62,7 @@ public class SQLiteCardDAO implements CardDAO {
         Log.i(TAG, "CCCC Persist Location");
         //Cursor cursor = db.rawQuery(countQuery, null);
 		Cursor cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
-
+		Log.i(TAG, "COUNT: " + cursor.getCount());
 		if (cursor.moveToFirst()) {
 		    while ( !cursor.isAfterLast() ) {
 		    	Log.i(TAG, "Table Name=> " + cursor.getString(0));
