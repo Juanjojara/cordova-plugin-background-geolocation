@@ -12,7 +12,7 @@ import android.util.Log;
 public class Card {
 	private static final String TAG = "LocationUpdateService";
 
-	private int created;
+	private long created;
 	private String info;
 	private String location;
 	private String latitude;
@@ -30,10 +30,10 @@ public class Card {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getCreated() {
+	public long getCreated() {
 		return created;
 	}
-	public void setCreated(int created) {
+	public void setCreated(long created) {
 		this.created = created;
 	}
 	public String getInfo() {
@@ -90,11 +90,11 @@ public class Card {
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 		card.setId(getCardId(context));
 		Log.i(TAG, "AAAA Persist Location");
-		long mlsDate = new Date().getTime();
+		//long mlsDate = new Date().getTime();
 		Log.i(TAG, "BBBB Persist Location");
-		int createdCard = safeLongToInt(mlsDate);
+		//int createdCard = safeLongToInt(mlsDate);
 		Log.i(TAG, "CCCC Persist Location");
-		card.setCreated(createdCard);
+		card.setCreated(new Date().getTime());
 		Log.i(TAG, "DDDD Persist Location");
 		card.setInfo("");
 		card.setLocation("");
