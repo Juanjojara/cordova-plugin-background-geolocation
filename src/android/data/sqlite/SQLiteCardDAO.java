@@ -50,7 +50,8 @@ public class SQLiteCardDAO implements CardDAO {
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 		String user_id = pref.getString("user_id", "");
 		Log.i(TAG, "---- Persist Location");
-        String countQuery = "SELECT count(id) countPendings FROM shared_cards WHERE user_id = ?";
+        //String countQuery = "SELECT count(id) countPendings FROM shared_cards WHERE user_id = ?";
+        String countQuery = "SELECT count(id) countPendings FROM shared_cards";
         Log.i(TAG, "USER ID: " + user_id);
         SQLiteDatabase db = new CardOpenHelper(context).getReadableDatabase();
         Log.i(TAG, "AAAA Persist Location");
@@ -58,7 +59,7 @@ public class SQLiteCardDAO implements CardDAO {
         Log.i(TAG, "BBBB Persist Location");
 		queryParams[0] =user_id;
         Log.i(TAG, "CCCC Persist Location");
-        Cursor cursor = db.rawQuery(countQuery, queryParams);
+        Cursor cursor = db.rawQuery(countQuery, null);
         Log.i(TAG, "DDDD Persist Location");
         int internetCards = cursor.getInt(cursor.getColumnIndex("countPendings"));
         Log.i(TAG, "EEEE Persist Location");
