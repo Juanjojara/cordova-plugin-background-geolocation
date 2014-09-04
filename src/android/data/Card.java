@@ -85,10 +85,13 @@ public class Card {
 	
 	public static Card createCard(android.location.Location originalLocation, Context context, String userId) {
 		Card card = new Card();
+		Log.i(TAG, "AAAA Persist Location");
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-
+		Log.i(TAG, "BBBB Persist Location");
 		card.setId(getCardId(context));
+		Log.i(TAG, "CCCC Persist Location");
 		card.setCreated(safeLongToInt(new Date().getTime()));
+		Log.i(TAG, "DDDD Persist Location");
 		card.setInfo("");
 		card.setLocation("");
 		card.setLongitude(String.valueOf(originalLocation.getLongitude()));
@@ -96,13 +99,13 @@ public class Card {
 		card.setSharing_level(pref.getString("sharing_setting", ""));
 		card.setLocation_level(pref.getString("location_setting", ""));
 		card.setUser_id(userId);
-
+		Log.i(TAG, "EEEE Persist Location");
 		boolean confirmationDlg = false;
         if (pref.getString("sharing_setting", "") != "automatic")
         	confirmationDlg = true;
 
 		card.setConfirm(confirmationDlg);
-
+		Log.i(TAG, "FFFF Persist Location");
 		return card;
 	}
 
