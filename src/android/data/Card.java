@@ -95,7 +95,9 @@ public class Card {
 		card.setLongitude(String.valueOf(originalLocation.getLongitude()));
 		card.setLatitude(String.valueOf(originalLocation.getLatitude()));
 		card.setSharing_level(pref.getString("sharing_setting", ""));
+		Log.i(TAG, "Sha Set: " + pref.getString("sharing_setting", ""));
 		card.setLocation_level(pref.getString("location_setting", ""));
+		Log.i(TAG, "Loc Set: " + pref.getString("location_setting", ""));
 		card.setUser_id(userId);
 		boolean confirmationDlg = false;
         if (pref.getString("sharing_setting", "") != "automatic")

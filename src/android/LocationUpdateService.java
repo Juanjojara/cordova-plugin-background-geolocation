@@ -857,8 +857,12 @@ public class LocationUpdateService extends Service implements LocationListener {
         com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
         Log.i(TAG, "2222 Persist Location");
         String user_id = "";
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+        SharedPreferences.Editor edit = pref.edit();
         try{
             user_id = params.getString("UserId");
+            edit.putString("user_id", user_id);
+            edit.commit();
             Log.i(TAG, "USER ID: " + user_id);
         } catch (Throwable e) {
             Log.w(TAG, "Exception obtaining user Id: " + e);
