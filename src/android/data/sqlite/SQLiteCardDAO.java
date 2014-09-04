@@ -8,6 +8,7 @@ import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
@@ -47,6 +48,25 @@ public class SQLiteCardDAO implements CardDAO {
  		edit.commit();
     }
 
+    private SQLiteDatabase openDatabase(String dbname) {
+        //if (this.getDatabase(dbname) != null) {
+	    //// TODO should wait for the db thread(s) to stop (!!)
+        //    this.closeDatabase(dbname);
+        //}
+
+        File dbfile = context.getDatabasePath(dbname);
+
+        if (!dbfile.exists()) {
+            dbfile.getParentFile().mkdirs();
+        }
+
+        Log.v("info", "Open sqlite db: " + dbfile.getAbsolutePath());
+
+        SQLiteDatabase mydb = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
+
+        return mydb;
+    }
+
 	public boolean persistCard(String tableName, Card card) {
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 		String user_id = pref.getString("user_id", "");
@@ -54,7 +74,8 @@ public class SQLiteCardDAO implements CardDAO {
         //String countQuery = "SELECT count(id) countPendings FROM shared_cards WHERE user_id = ?";
         String countQuery = "SELECT count(id) countPendings FROM shared_cards";
         Log.i(TAG, "USER ID: " + user_id);
-        SQLiteDatabase db = new CardOpenHelper(context).getReadableDatabase();
+        //SQLiteDatabase db = new CardOpenHelper(context).getReadableDatabase();
+        SQLiteDatabase db = openDatabase("dbLifeshare.db");
         Log.i(TAG, "AAAA Persist Location");
         String[] queryParams = new String[1];
         Log.i(TAG, "BBBB Persist Location");
