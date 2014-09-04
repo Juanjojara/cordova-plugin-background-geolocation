@@ -79,9 +79,12 @@ public class SQLiteCardDAO implements CardDAO {
 		//queryParams[0] =user_id;
         Log.i(TAG, "CCCC Persist Location");
         Cursor cursor = db.rawQuery(countQuery, new String[]{user_id});
+        //Cursor cursor = db.rawQuery(countQuery, null);
 		Log.i(TAG, "DDDD Persist Location");
+		cursor.moveToFirst();
+		Log.i(TAG, "EEEE Persist Location");
         int internetCards = cursor.getInt(cursor.getColumnIndex("countPendings"));
-        Log.i(TAG, "EEEE Persist Location");
+        Log.i(TAG, "FFFF Persist Location");
         cursor.close();
  		db.close();
  		Log.i(TAG, "RC = " + internetCards);
