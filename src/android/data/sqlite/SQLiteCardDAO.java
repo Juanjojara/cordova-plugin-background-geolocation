@@ -33,8 +33,9 @@ public class SQLiteCardDAO implements CardDAO {
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 		String user_id = pref.getString("user_id", "");
         String countQuery = "SELECT count(id) countPendings FROM pending_geo WHERE user_id = ?";
-        SQLiteDatabase db = new CardOpenHelper(context).getReadableDatabase();
+        SQLiteDatabase db = openDatabase("dbLifeshare.db");
         Cursor cursor = db.rawQuery(countQuery, new String[]{user_id});
+		cursor.moveToFirst();
         int internetCards = cursor.getInt(cursor.getColumnIndex("countPendings"));
         cursor.close();
  		db.close();
@@ -68,37 +69,17 @@ public class SQLiteCardDAO implements CardDAO {
     }
 
 	public boolean persistCard(String tableName, Card card) {
-		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-		String user_id = pref.getString("user_id", "");
-        String countQuery = "SELECT count(id) countPendings FROM shared_cards WHERE user_id = ?";
-        //String countQuery = "SELECT count(id) countPendings FROM shared_cards";
-        Log.i(TAG, "USER ID: " + user_id);
-        //SQLiteDatabase db = new CardOpenHelper(context).getReadableDatabase();
         SQLiteDatabase db = openDatabase("dbLifeshare.db");
-        //String[] queryParams = new String[1];
-		//queryParams[0] =user_id;
-        Log.i(TAG, "CCCC Persist Location");
-        Cursor cursor = db.rawQuery(countQuery, new String[]{user_id});
-        //Cursor cursor = db.rawQuery(countQuery, null);
-		Log.i(TAG, "DDDD Persist Location");
-		cursor.moveToFirst();
-		Log.i(TAG, "EEEE Persist Location");
-        int internetCards = cursor.getInt(cursor.getColumnIndex("countPendings"));
-        Log.i(TAG, "FFFF Persist Location");
-        cursor.close();
- 		db.close();
- 		Log.i(TAG, "RC = " + internetCards);
-		/*SQLiteDatabase db = new CardOpenHelper(context).getWritableDatabase();
+
+		//SQLiteDatabase db = new CardOpenHelper(context).getWritableDatabase();
 		db.beginTransaction();
-		Log.i(TAG, "DB Open: " + db.isOpen());
 		ContentValues values = getContentValues(card);
 		long rowId = db.insert(tableName, null, values);
 		Log.d(TAG, "After insert, rowId = " + rowId);
 		db.setTransactionSuccessful();
 		db.endTransaction();
 		db.close();
-		*/
-		long rowId = -1;
+		
 		if (rowId > -1) {
 			return true;
 		} else {
