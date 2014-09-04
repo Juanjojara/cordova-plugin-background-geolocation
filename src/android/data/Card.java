@@ -7,9 +7,11 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.os.SystemClock;
-
+import android.util.Log;
 
 public class Card {
+	private static final String TAG = "LocationUpdateService";
+	
 	private int created;
 	private String info;
 	private String location;
