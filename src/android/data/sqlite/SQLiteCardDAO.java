@@ -20,7 +20,7 @@ import com.tenforwardconsulting.cordova.bgloc.data.CardDAO;
 
 public class SQLiteCardDAO implements CardDAO {
 	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	private static final String TAG = "SQLiteCardDAO";
+	private static final String TAG = "LocationUpdateService";
 	private Context context;
 	
 	public SQLiteCardDAO(Context context) {
@@ -49,6 +49,7 @@ public class SQLiteCardDAO implements CardDAO {
 	public boolean persistCard(String tableName, Card card) {
 		SQLiteDatabase db = new CardOpenHelper(context).getWritableDatabase();
 		db.beginTransaction();
+		Log.i(TAG, "DB Open: " + db.isOpen());
 		ContentValues values = getContentValues(card);
 		long rowId = db.insert(tableName, null, values);
 		Log.d(TAG, "After insert, rowId = " + rowId);
