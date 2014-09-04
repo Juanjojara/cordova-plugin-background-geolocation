@@ -13,6 +13,7 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import com.tenforwardconsulting.cordova.bgloc.data.Card;
@@ -59,7 +60,12 @@ public class SQLiteCardDAO implements CardDAO {
         Log.i(TAG, "BBBB Persist Location");
 		queryParams[0] =user_id;
         Log.i(TAG, "CCCC Persist Location");
-        Cursor cursor = db.rawQuery(countQuery, null);
+        try
+		{
+        	Cursor cursor = db.rawQuery(countQuery, null);
+        } catch (SQLiteException e){
+        	Log.i(TAG, "Error: " + e.error);
+        }
         Log.i(TAG, "DDDD Persist Location");
         int internetCards = cursor.getInt(cursor.getColumnIndex("countPendings"));
         Log.i(TAG, "EEEE Persist Location");
