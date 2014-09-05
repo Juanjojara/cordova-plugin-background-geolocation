@@ -49,6 +49,27 @@ public class SQLiteCardDAO implements CardDAO {
  		edit.commit();
     }
 
+    //			INSERT EN BRIDGE
+    /*public void internetPendingCards() {
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+		String user_id = pref.getString("user_id", "");
+        String countQuery = "SELECT count(id) countPendings FROM pending_geo WHERE user_id = ?";
+        SQLiteDatabase db = openDatabase("dbLifeshare.db");
+        Cursor cursor = db.rawQuery(countQuery, new String[]{user_id});
+		cursor.moveToFirst();
+        int internetCards = cursor.getInt(cursor.getColumnIndex("countPendings"));
+        cursor.close();
+ 		db.close();
+ 		SharedPreferences.Editor edit = pref.edit();
+ 		if (internetCards > 0){
+ 			edit.putBoolean("pendingInternet", true);
+ 		}else{
+ 			edit.putBoolean("pendingInternet", false);
+ 		}
+ 		Log.d(TAG, "RC = " + internetCards);
+ 		edit.commit();
+    }*/
+
     private SQLiteDatabase openDatabase(String dbname) {
         //if (this.getDatabase(dbname) != null) {
 	    //// TODO should wait for the db thread(s) to stop (!!)
