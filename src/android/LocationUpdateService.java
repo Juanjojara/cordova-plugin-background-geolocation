@@ -684,7 +684,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                 SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
                 String location_setting = pref.getString("location_setting", "");
                 String sharing_setting = pref.getString("sharing_setting", "");
-                String user_id = params.getString("UserId");
+                String user_id = pref.getString("user_id", "");
                 params.remove("LocationSetting");
                 params.remove("SharingSetting");
                 params.remove("UserId");
