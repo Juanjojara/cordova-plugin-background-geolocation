@@ -105,28 +105,8 @@ public class Card {
 		boolean confirmationDlg = false;
         if (pref.getString("sharing_setting", "") != "automatic")
         	confirmationDlg = true;
-
 		card.setConfirm(confirmationDlg);
+		Log.i(TAG, "Conf Set: " + confirmationDlg);
 		return card;
 	}
-
-	public static int getCardId(Context context){
-		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor edit = pref.edit();
-
-        int cardId = pref.getInt("cardId", 1);
-        edit.putInt("cardId", cardId+1);
-        edit.commit();
-        Log.i(TAG, "CardID serv: " + cardId + 1);
-
-        return cardId;
-    }
-
-    public static int safeLongToInt(long l) {
-    if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
-        throw new IllegalArgumentException
-            (l + " cannot be cast to int without changing its value.");
-    }
-    return (int) l;
-}
 }

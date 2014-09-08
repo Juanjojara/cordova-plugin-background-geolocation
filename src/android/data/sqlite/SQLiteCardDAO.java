@@ -63,7 +63,7 @@ public class SQLiteCardDAO implements CardDAO {
 		args.put("id", currentId+1);
         int updRows = db.update("bridge", args, null, null);
  		db.close();
- 		Log.i(TAG, "ID = " + updRows);
+ 		Log.i(TAG, "ID = " + (currentId+1) + " Rows affected = " + updRows);
 
  		return currentId;
     }

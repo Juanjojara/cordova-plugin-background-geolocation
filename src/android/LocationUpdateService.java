@@ -681,8 +681,9 @@ public class LocationUpdateService extends Service implements LocationListener {
                 HttpPost request = new HttpPost(url);
 
                 //Get user settings for creating and sharing a card
-                String location_setting = params.getString("LocationSetting");
-                String sharing_setting = params.getString("SharingSetting");
+                SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+                String location_setting = pref.getString("location_setting", "");
+                String sharing_setting = pref.getString("sharing_setting", "");
                 String user_id = params.getString("UserId");
                 params.remove("LocationSetting");
                 params.remove("SharingSetting");
@@ -698,7 +699,6 @@ public class LocationUpdateService extends Service implements LocationListener {
                 String curInfo = getInfo();
 
                 //Control to avoid creating redundant cards
-                SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
                 SharedPreferences.Editor edit = pref.edit();
 
                 String lastAdd = pref.getString("lastAddress", "");
@@ -857,11 +857,18 @@ public class LocationUpdateService extends Service implements LocationListener {
         com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
         Log.i(TAG, "2222 Persist Location");
         String user_id = "";
+        String location_setting = "";
+        String sharing_setting = "";
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
         SharedPreferences.Editor edit = pref.edit();
         try{
             user_id = params.getString("UserId");
+            location_setting = params.getString("LocationSetting");
+            sharing_setting = params.getString("SharingSetting");
+                
             edit.putString("user_id", user_id);
+            edit.putString("location_setting", location_setting);
+            edit.putString("sharing_setting", sharing_setting);
             edit.commit();
             Log.i(TAG, "USER ID: " + user_id);
         } catch (Throwable e) {
@@ -869,7 +876,6 @@ public class LocationUpdateService extends Service implements LocationListener {
             e.printStackTrace();
         }
         Log.i(TAG, "3333 Persist Location");
-        //com.tenforwardconsulting.cordova.bgloc.data.Card savedCard = com.tenforwardconsulting.cordova.bgloc.data.Card.createCard(location, mContext, user_id);
         int cardId = cdao.getCardId();
         com.tenforwardconsulting.cordova.bgloc.data.Card savedCard = com.tenforwardconsulting.cordova.bgloc.data.Card.createCard(location, mContext, user_id, cardId);
         Log.i(TAG, "4444 Persist Location");
