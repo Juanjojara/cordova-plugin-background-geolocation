@@ -49,26 +49,24 @@ public class SQLiteCardDAO implements CardDAO {
  		edit.commit();
     }
 
-    //			INSERT EN BRIDGE
-    /*public void internetPendingCards() {
-		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-		String user_id = pref.getString("user_id", "");
-        String countQuery = "SELECT count(id) countPendings FROM pending_geo WHERE user_id = ?";
+    //			INSERT IN BRIDGE
+    public int getCardId() {
         SQLiteDatabase db = openDatabase("dbLifeshare.db");
-        Cursor cursor = db.rawQuery(countQuery, new String[]{user_id});
+        //GET CURRENT ID
+        String idQuery = "SELECT id FROM bridge";
+        Cursor cursor = db.rawQuery(idQuery, null);
 		cursor.moveToFirst();
-        int internetCards = cursor.getInt(cursor.getColumnIndex("countPendings"));
+        int currentId = cursor.getInt(cursor.getColumnIndex("id"));
         cursor.close();
+        //UPDATE ID
+        ContentValues args = new ContentValues();
+		args.put("id", currentId+1);
+        int updRows = db.update("bridge", args, null, null);
  		db.close();
- 		SharedPreferences.Editor edit = pref.edit();
- 		if (internetCards > 0){
- 			edit.putBoolean("pendingInternet", true);
- 		}else{
- 			edit.putBoolean("pendingInternet", false);
- 		}
- 		Log.d(TAG, "RC = " + internetCards);
- 		edit.commit();
-    }*/
+ 		Log.i(TAG, "ID = " + updRows);
+
+ 		return currentId;
+    }
 
     private SQLiteDatabase openDatabase(String dbname) {
         //if (this.getDatabase(dbname) != null) {

@@ -9,6 +9,8 @@ import android.preference.PreferenceManager;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.tenforwardconsulting.cordova.bgloc.data.sqlite.SQLiteCardDAO;
+
 public class Card {
 	private static final String TAG = "LocationUpdateService";
 
@@ -85,10 +87,10 @@ public class Card {
 		this.confirm = confirm;
 	}
 	
-	public static Card createCard(android.location.Location originalLocation, Context context, String userId) {
+	public static Card createCard(android.location.Location originalLocation, Context context, String userId, CardDAO cdao) {
 		Card card = new Card();
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-		card.setId(getCardId(context));
+		card.setId(cdao.getCardId());
 		card.setCreated(new Date().getTime());
 		card.setInfo("");
 		card.setLocation("");
