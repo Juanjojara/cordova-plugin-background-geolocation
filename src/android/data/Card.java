@@ -88,10 +88,10 @@ public class Card {
 		this.confirm = confirm;
 	}
 	
-	public static Card createCard(android.location.Location originalLocation, Context context, String userId, CardDAO cdao) {
+	public static Card createCard(android.location.Location originalLocation, Context context, String userId, int cardId) {
 		Card card = new Card();
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-		card.setId(cdao.getCardId());
+		card.setId(cardId);
 		card.setCreated(new Date().getTime());
 		card.setInfo("");
 		card.setLocation("");
