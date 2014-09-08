@@ -103,7 +103,7 @@ public class Card {
 		Log.i(TAG, "Loc Set: " + pref.getString("location_setting", ""));
 		card.setUser_id(userId);
 		boolean confirmationDlg = false;
-        if (pref.getString("sharing_setting", "") != "automatic")
+        if (!pref.getString("sharing_setting", "").equals("automatic"))
         	confirmationDlg = true;
 		card.setConfirm(confirmationDlg);
 		Log.i(TAG, "Conf Set: " + confirmationDlg);
