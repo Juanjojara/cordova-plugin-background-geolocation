@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.tenforwardconsulting.cordova.bgloc.data.CardDAO;
 import com.tenforwardconsulting.cordova.bgloc.data.sqlite.SQLiteCardDAO;
 
 public class Card {
