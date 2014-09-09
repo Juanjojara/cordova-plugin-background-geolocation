@@ -29,7 +29,30 @@ public class SQLiteCardDAO implements CardDAO {
 		this.context = context;
 	}
 	
-	public void internetPendingCards() {
+	public Card[] geoPendingCards() {
+		SQLiteDatabase db = null;
+		Cursor c = null;
+		List<Card> all = new ArrayList<Card>();
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+		String user_id = pref.getString("user_id", "");
+		try {
+			db = openDatabase("dbLifeshare.db");
+			c = db.query("pending_geo", new String[]{"id", "latitude", "longitude"}, "user_id = ?", new String[]{user_id}, null, null, "id");
+			while (c.moveToNext()) {
+				all.add(hydrate(c));
+			}
+		} finally {
+			if (c != null) {
+				c.close();
+			}
+			if (db != null) {
+				db.close();
+			}
+		}
+		return all.toArray(new Card[all.size()]);
+	}
+
+	public void geoCards() {
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 		String user_id = pref.getString("user_id", "");
         String countQuery = "SELECT count(id) countPendings FROM pending_geo WHERE user_id = ?";
@@ -106,7 +129,19 @@ public class SQLiteCardDAO implements CardDAO {
 			return false;
 		}
 	}
+	
+	private Card hydrate(Cursor c) {
+		Card card = new Card();
+
+		card.setId(c.getLong(c.getColumnIndex("id")));
+		card.setLatitude(c.getString(c.getColumnIndex("latitude")));
+		card.setLongitude(c.getString(c.getColumnIndex("longitude")));
+
+		//l.setRecordedAt(stringToDate(c.getString(c.getColumnIndex("recordedAt"))));
 		
+		return card;
+	}
+
 	private ContentValues getContentValues(Card card) {
 		ContentValues values = new ContentValues();
 		values.put("id", card.getId());

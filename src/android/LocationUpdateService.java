@@ -428,9 +428,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
         // Go ahead and cache, push to server
         lastLocation = location;
-        Log.i(TAG, "1111 Persist Location");
         persistLocation(location);
-        Log.i(TAG, "9999 Persist Location");
 
         if (this.isNetworkConnected()) {
             Log.d(TAG, "Scheduling location network post");
@@ -757,6 +755,99 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
     }
 
+    private boolean postCard(com.tenforwardconsulting.cordova.bgloc.data.Card geoCard) {
+        if (geoCard == null) {
+            Log.w(TAG, "postCard: invalid geo card");
+            return false;
+        }else{
+            try {
+                Log.i(TAG, "Posting  native location update: " + l);
+                DefaultHttpClient httpClient = new DefaultHttpClient();
+                HttpPost request = new HttpPost(url);
+
+                //Get user settings for creating and sharing a card
+                SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+                String location_setting = pref.getString("location_setting", "");
+                String sharing_setting = pref.getString("sharing_setting", "");
+                String user_id = pref.getString("user_id", "");
+                /*params.remove("LocationSetting");
+                params.remove("SharingSetting");
+                params.remove("UserId");*/
+
+                String curAdd = getAddress(Double.parseDouble(geoCard.getLatitude()), Double.parseDouble(geoCard.getLongitude()), location_setting);
+                if (curAdd == null){
+                    if (isNetworkConnected()){
+                        postNotification("Error", "Please reset your device and start the application again");
+                    }
+                    return false;                    
+                }
+                String curInfo = getInfo();
+
+                //Control to avoid creating redundant cards
+                SharedPreferences.Editor edit = pref.edit();
+
+                String lastAdd = pref.getString("lastAddress", "");
+                String lastInfo = pref.getString("lastInfo", "");
+
+                if (curAdd.equals(lastAdd) && curInfo.equals(lastInfo)){
+                    Log.i(TAG, "repeated card");
+                    //postNotification(curInfo, curAdd + " (Not shared)");
+                    return true;
+                }else{
+                    Log.i(TAG, "new card");
+                    edit.putString("lastAddress", curAdd);
+                    edit.putString("lastInfo", curInfo);
+                    edit.commit();
+                }
+
+                //Create a notification if necessary
+                if (sharing_setting.equals("confirm")){
+                    //UPDATE DB WITH LOC & INFO 
+                    //MOVE CARD TO pending_confirm
+                    //SEND NOTIFICATION
+                    postNotification(curInfo, curAdd);
+                    //return true;
+                    Log.i(TAG, "Confirm Sharing");
+                }else{
+                    //update card
+                    //share card
+                    Log.i(TAG, "Automatic Sharing");
+                }
+
+                //Proces for creating the card on the server
+                params.put("info", curInfo);
+                params.put("lat", l.getLatitude());
+                params.put("lon", l.getLongitude());
+                params.put("location", curAdd);
+
+                StringEntity se = new StringEntity(params.toString());
+                request.setEntity(se);
+                request.setHeader("Content-type", "application/json");
+
+                Iterator<String> headkeys = headers.keys();
+                while( headkeys.hasNext() ){
+                    String headkey = headkeys.next();
+                    if(headkey != null) {
+                        Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
+                        request.setHeader(headkey, (String)headers.getString(headkey));
+                    }
+                }
+                Log.d(TAG, "Posting to " + request.getURI().toString());
+                HttpResponse response = httpClient.execute(request);
+                Log.i(TAG, "Response received: " + response.getStatusLine());
+                if ((response.getStatusLine().getStatusCode() == 200) || (response.getStatusLine().getStatusCode() == 204)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Throwable e) {
+                Log.w(TAG, "Exception posting location: " + e);
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
     private void postNotification(String info, String loc){
         Notification.Builder shareLocBuilder = new Notification.Builder(this);
         shareLocBuilder.setContentTitle("Lifeshare");
@@ -855,12 +946,12 @@ public class LocationUpdateService extends Service implements LocationListener {
         LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
         CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
         com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
-        Log.i(TAG, "2222 Persist Location");
+        //Store settings variables passed during the initial configuration of the service
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+        SharedPreferences.Editor edit = pref.edit();
         String user_id = "";
         String location_setting = "";
         String sharing_setting = "";
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-        SharedPreferences.Editor edit = pref.edit();
         try{
             user_id = params.getString("UserId");
             location_setting = params.getString("LocationSetting");
@@ -870,27 +961,23 @@ public class LocationUpdateService extends Service implements LocationListener {
             edit.putString("location_setting", location_setting);
             edit.putString("sharing_setting", sharing_setting);
             edit.commit();
-            Log.i(TAG, "USER ID: " + user_id);
         } catch (Throwable e) {
             Log.w(TAG, "Exception obtaining user Id: " + e);
             e.printStackTrace();
         }
-        Log.i(TAG, "3333 Persist Location");
+        //Create the partial card for this location
         int cardId = cdao.getCardId();
         com.tenforwardconsulting.cordova.bgloc.data.Card savedCard = com.tenforwardconsulting.cordova.bgloc.data.Card.createCard(location, mContext, user_id, cardId);
-        Log.i(TAG, "4444 Persist Location");
         if (dao.persistLocation(savedLocation)) {
             Log.d(TAG, "Persisted Location: " + savedLocation);
         } else {
             Log.w(TAG, "Failed to persist location");
         }
-        Log.i(TAG, "7777 Persist Location");
         if (cdao.persistCard("pending_geo", savedCard)) {
             Log.d(TAG, "Persisted Card: " + savedCard);
         } else {
             Log.w(TAG, "Failed to persist card in pending_geo table");
         }
-        Log.i(TAG, "8888 Persist Location");
     }
 
     private boolean isNetworkConnected() {
@@ -951,6 +1038,15 @@ public class LocationUpdateService extends Service implements LocationListener {
                     locationDAO.deleteLocation(savedLocation);
                 }
             }
+            Log.i(TAG, "1111 Post Location");
+            CardDAO cardDAO = DAOFactory.createCardDAO(LocationUpdateService.this.getApplicationContext());
+            for (com.tenforwardconsulting.cordova.bgloc.data.Card savedGeoCard : cardDAO.geoPendingCards()) {
+                Log.d(TAG, "Posting saved card");
+                if (postCard(savedGeoCard)) {
+                    cardDAO.deleteCard(savedGeoCard);
+                }
+            }
+            Log.i(TAG, "9999 Post Location");
             return true;
         }
         @Override
