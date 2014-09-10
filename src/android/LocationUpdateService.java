@@ -784,18 +784,18 @@ public class LocationUpdateService extends Service implements LocationListener {
                 String lastAdd = pref.getString("lastAddress", "");
                 String lastInfo = pref.getString("lastInfo", "");
 
-                if (curAdd.equals(lastAdd) && curInfo.equals(lastInfo)){
+                /*if (curAdd.equals(lastAdd) && curInfo.equals(lastInfo)){
                     Log.i(TAG, "repeated card");
                     //postNotification(curInfo, curAdd + " (Not shared)");
                     return true;
-                }else{
+                }else{*/
                     Log.i(TAG, "new card");
                     edit.putString("lastAddress", curAdd);
                     edit.putString("lastInfo", curInfo);
                     edit.commit();
                     geoCard.setInfo(curInfo);
                     geoCard.setLocation(curAdd);
-                }
+                //}
 
                 CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
 
@@ -1076,7 +1076,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             for (com.tenforwardconsulting.cordova.bgloc.data.Card savedGeoCard : cardDAO.geoPendingCards()) {
                 Log.d(TAG, "Posting saved card");
                 if (postCard(savedGeoCard)) {
-                    //cardDAO.deleteCard("pending_geo", savedGeoCard);
+                    cardDAO.deleteCard("pending_geo", savedGeoCard);
                 }
             }
             Log.i(TAG, "9999 Post Location");
