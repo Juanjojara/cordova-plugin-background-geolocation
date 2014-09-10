@@ -1070,7 +1070,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             for (com.tenforwardconsulting.cordova.bgloc.data.Card savedGeoCard : cardDAO.geoPendingCards()) {
                 Log.d(TAG, "Posting saved card");
                 if (postCard(savedGeoCard)) {
-                    cardDAO.deleteCard(savedGeoCard);
+                    cardDAO.deleteCard("pending_geo", savedGeoCard);
                 }
             }
             Log.i(TAG, "9999 Post Location");

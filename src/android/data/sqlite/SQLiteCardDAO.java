@@ -124,6 +124,16 @@ public class SQLiteCardDAO implements CardDAO {
 			return false;
 		}
 	}
+
+	public void deleteCard(String tableName, Card card) {
+		//SQLiteDatabase db = new LocationOpenHelper(context).getWritableDatabase();
+		SQLiteDatabase db = openDatabase("dbLifeshare.db");
+		db.beginTransaction();
+		db.delete(tableName, "id = ?", new String[]{card.getId().toString()});
+		db.setTransactionSuccessful();
+		db.endTransaction();
+		db.close();
+	}
 	
 	private Card hydrate(Cursor c) {
 		Card card = new Card();

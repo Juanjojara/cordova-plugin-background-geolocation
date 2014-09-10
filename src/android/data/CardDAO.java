@@ -5,5 +5,5 @@ public interface CardDAO {
 	public void geoCards();
 	public int getCardId();
 	public boolean persistCard(String table, Card card);
-	//public void deleteCard(Card l);
+	public void deleteCard(String tableName, Card card);
 }
