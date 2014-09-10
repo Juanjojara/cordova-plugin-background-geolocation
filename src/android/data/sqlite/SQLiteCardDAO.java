@@ -129,7 +129,7 @@ public class SQLiteCardDAO implements CardDAO {
 		//SQLiteDatabase db = new LocationOpenHelper(context).getWritableDatabase();
 		SQLiteDatabase db = openDatabase("dbLifeshare.db");
 		db.beginTransaction();
-		db.delete(tableName, "id = ?", new String[]{card.getId().toString()});
+		db.delete(tableName, "id = ?", new String[]{Integer.toString(card.getId())});
 		db.setTransactionSuccessful();
 		db.endTransaction();
 		db.close();
