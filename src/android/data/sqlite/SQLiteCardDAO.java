@@ -37,7 +37,7 @@ public class SQLiteCardDAO implements CardDAO {
 		String user_id = pref.getString("user_id", "");
 		try {
 			db = openDatabase("dbLifeshare.db");
-			c = db.query("pending_geo", new String[]{"id", "latitude", "longitude"}, "user_id = ?", new String[]{user_id}, null, null, "id");
+			c = db.query("pending_geo", new String[]{"id", "created", "info", "location", "latitude", "longitude", "sharing_level", "location_level", "user_id", "confirm"}, "user_id = ?", new String[]{user_id}, null, null, "id");
 			while (c.moveToNext()) {
 				all.add(hydrate(c));
 			}
@@ -92,11 +92,6 @@ public class SQLiteCardDAO implements CardDAO {
     }
 
     private SQLiteDatabase openDatabase(String dbname) {
-        //if (this.getDatabase(dbname) != null) {
-	    //// TODO should wait for the db thread(s) to stop (!!)
-        //    this.closeDatabase(dbname);
-        //}
-
         File dbfile = context.getDatabasePath(dbname);
 
         if (!dbfile.exists()) {
@@ -133,11 +128,16 @@ public class SQLiteCardDAO implements CardDAO {
 	private Card hydrate(Cursor c) {
 		Card card = new Card();
 
-		card.setId(c.getLong(c.getColumnIndex("id")));
+		card.setId(c.getInt(c.getColumnIndex("id")));
+		card.setCreated(c.getLong(c.getColumnIndex("created")));
+		card.setInfo(c.getString(c.getColumnIndex("info")));
+		card.setLocation(c.getString(c.getColumnIndex("location")));
 		card.setLatitude(c.getString(c.getColumnIndex("latitude")));
 		card.setLongitude(c.getString(c.getColumnIndex("longitude")));
-
-		//l.setRecordedAt(stringToDate(c.getString(c.getColumnIndex("recordedAt"))));
+		card.setSharing_level(c.getString(c.getColumnIndex("sharing_level")));
+		card.setLocation_level(c.getString(c.getColumnIndex("location_level")));
+		card.setUser_id(c.getString(c.getColumnIndex("user_id")));
+		card.setConfirm(c.getString(c.getColumnIndex("confirm")));
 		
 		return card;
 	}

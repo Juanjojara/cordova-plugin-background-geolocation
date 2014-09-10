@@ -23,7 +23,7 @@ public class Card {
 	private String sharing_level;
 	private String location_level;
 	private String user_id;
-	private boolean confirm;
+	private String confirm;
 	
 	private int id;
 	
@@ -81,10 +81,10 @@ public class Card {
 	public void setUser_id(String user_id) {
 		this.user_id = user_id;
 	}
-	public boolean getConfirm() {
+	public String getConfirm() {
 		return confirm;
 	}
-	public void setConfirm(boolean confirm) {
+	public void setConfirm(String confirm) {
 		this.confirm = confirm;
 	}
 	
@@ -102,9 +102,9 @@ public class Card {
 		card.setLocation_level(pref.getString("location_setting", ""));
 		Log.i(TAG, "Loc Set: " + pref.getString("location_setting", ""));
 		card.setUser_id(userId);
-		boolean confirmationDlg = false;
+		String confirmationDlg = "false";
         if (!pref.getString("sharing_setting", "").equals("automatic"))
-        	confirmationDlg = true;
+        	confirmationDlg = "true";
 		card.setConfirm(confirmationDlg);
 		Log.i(TAG, "Conf Set: " + confirmationDlg);
 		return card;

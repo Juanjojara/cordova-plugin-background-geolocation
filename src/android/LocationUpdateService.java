@@ -761,20 +761,15 @@ public class LocationUpdateService extends Service implements LocationListener {
             return false;
         }else{
             try {
-                Log.i(TAG, "Posting  native location update: " + l);
-                DefaultHttpClient httpClient = new DefaultHttpClient();
-                HttpPost request = new HttpPost(url);
-
+                Log.i(TAG, "Posting  native card: " + geoCard);
+                
                 //Get user settings for creating and sharing a card
                 SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
                 String location_setting = pref.getString("location_setting", "");
                 String sharing_setting = pref.getString("sharing_setting", "");
                 String user_id = pref.getString("user_id", "");
-                /*params.remove("LocationSetting");
-                params.remove("SharingSetting");
-                params.remove("UserId");*/
-
-                String curAdd = getAddress(Double.parseDouble(geoCard.getLatitude()), Double.parseDouble(geoCard.getLongitude()), location_setting);
+                
+                String curAdd = getAddress(Double.parseDouble(geoCard.getLatitude()), Double.parseDouble(geoCard.getLongitude()), geoCard.getLocation_level());
                 if (curAdd == null){
                     if (isNetworkConnected()){
                         postNotification("Error", "Please reset your device and start the application again");
@@ -798,53 +793,85 @@ public class LocationUpdateService extends Service implements LocationListener {
                     edit.putString("lastAddress", curAdd);
                     edit.putString("lastInfo", curInfo);
                     edit.commit();
+                    geoCard.setInfo(curInfo);
+                    geoCard.setLocation(curAdd);
                 }
+
+                CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
 
                 //Create a notification if necessary
                 if (sharing_setting.equals("confirm")){
-                    //UPDATE DB WITH LOC & INFO 
-                    //MOVE CARD TO pending_confirm
-                    //SEND NOTIFICATION
-                    postNotification(curInfo, curAdd);
-                    //return true;
-                    Log.i(TAG, "Confirm Sharing");
+                    if (cdao.persistCard("pending_confirm", geoCard)) {
+                        Log.i(TAG, "Confirm Sharing");
+                        //SEND NOTIFICATION
+                        postNotification(curInfo, curAdd);
+                        Log.d(TAG, "Persisted Card in pending_confirm: " + geoCard);
+                        return true;
+                    } else {
+                        Log.w(TAG, "Failed to persist card in pending_confirm table");
+                        return false;
+                    }
                 }else{
-                    //update card
-                    //share card
                     Log.i(TAG, "Automatic Sharing");
-                }
-
-                //Proces for creating the card on the server
-                params.put("info", curInfo);
-                params.put("lat", l.getLatitude());
-                params.put("lon", l.getLongitude());
-                params.put("location", curAdd);
-
-                StringEntity se = new StringEntity(params.toString());
-                request.setEntity(se);
-                request.setHeader("Content-type", "application/json");
-
-                Iterator<String> headkeys = headers.keys();
-                while( headkeys.hasNext() ){
-                    String headkey = headkeys.next();
-                    if(headkey != null) {
-                        Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
-                        request.setHeader(headkey, (String)headers.getString(headkey));
+                    if (shareCard(geoCard)){
+                        if (cdao.persistCard("shared_cards", geoCard)) {
+                            Log.d(TAG, "Persisted Card in shared_cards: " + geoCard);
+                        } else {
+                            Log.w(TAG, "CARD SHARED! but failed to persist card in shared_cards table");
+                        }
+                        return true;
+                    }
+                    else{
+                        if (cdao.persistCard("pending_internet", geoCard)) {
+                            Log.d(TAG, "Persisted Card in pending_internet: " + geoCard);
+                            return true;
+                        } else {
+                            Log.w(TAG, "Failed to persist card in pending_internet table");
+                            return false;
+                        }
                     }
                 }
-                Log.d(TAG, "Posting to " + request.getURI().toString());
-                HttpResponse response = httpClient.execute(request);
-                Log.i(TAG, "Response received: " + response.getStatusLine());
-                if ((response.getStatusLine().getStatusCode() == 200) || (response.getStatusLine().getStatusCode() == 204)) {
-                    return true;
-                } else {
-                    return false;
-                }
             } catch (Throwable e) {
-                Log.w(TAG, "Exception posting location: " + e);
+                Log.w(TAG, "Exception updating geo card: " + e);
                 e.printStackTrace();
                 return false;
             }
+        }
+    }
+
+    private boolean shareCard(com.tenforwardconsulting.cordova.bgloc.data.Card geoCard){
+        params.remove("LocationSetting");
+        params.remove("SharingSetting");
+        params.remove("UserId");
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        HttpPost request = new HttpPost(url);
+
+        //Proces for creating the card on the server
+        params.put("info", geoCard.getInfo());
+        params.put("lat", geoCard.getLatitude());
+        params.put("lon", geoCard.getLongitude());
+        params.put("location", geoCard.getLocation());
+        params.put("timestamp", geoCard.getCreated());
+
+        StringEntity se = new StringEntity(params.toString());
+        request.setEntity(se);
+        request.setHeader("Content-type", "application/json");
+
+        Iterator<String> headkeys = headers.keys();
+        while( headkeys.hasNext() ){
+            String headkey = headkeys.next();
+            if(headkey != null) {
+                Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
+                request.setHeader(headkey, (String)headers.getString(headkey));
+            }
+        }
+        Log.d(TAG, "Posting to " + request.getURI().toString());
+        HttpResponse response = httpClient.execute(request);
+        Log.i(TAG, "Response received: " + response.getStatusLine());
+        if ((response.getStatusLine().getStatusCode() == 200) || (response.getStatusLine().getStatusCode() == 204)) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -943,9 +970,9 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private void persistLocation(Location location) {
-        LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
+        //LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
         CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
-        com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
+        //com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
         //Store settings variables passed during the initial configuration of the service
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
         SharedPreferences.Editor edit = pref.edit();
@@ -968,13 +995,13 @@ public class LocationUpdateService extends Service implements LocationListener {
         //Create the partial card for this location
         int cardId = cdao.getCardId();
         com.tenforwardconsulting.cordova.bgloc.data.Card savedCard = com.tenforwardconsulting.cordova.bgloc.data.Card.createCard(location, mContext, user_id, cardId);
-        if (dao.persistLocation(savedLocation)) {
+        /*if (dao.persistLocation(savedLocation)) {
             Log.d(TAG, "Persisted Location: " + savedLocation);
         } else {
             Log.w(TAG, "Failed to persist location");
-        }
+        }*/
         if (cdao.persistCard("pending_geo", savedCard)) {
-            Log.d(TAG, "Persisted Card: " + savedCard);
+            Log.d(TAG, "Persisted Card in pending_geo: " + savedCard);
         } else {
             Log.w(TAG, "Failed to persist card in pending_geo table");
         }
@@ -1031,13 +1058,13 @@ public class LocationUpdateService extends Service implements LocationListener {
         @Override
         protected Boolean doInBackground(Object...objects) {
             Log.d(TAG, "Executing PostLocationTask#doInBackground");
-            LocationDAO locationDAO = DAOFactory.createLocationDAO(LocationUpdateService.this.getApplicationContext());
+            /*LocationDAO locationDAO = DAOFactory.createLocationDAO(LocationUpdateService.this.getApplicationContext());
             for (com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation : locationDAO.getAllLocations()) {
                 Log.d(TAG, "Posting saved location");
                 if (postLocation(savedLocation)) {
                     locationDAO.deleteLocation(savedLocation);
                 }
-            }
+            }*/
             Log.i(TAG, "1111 Post Location");
             CardDAO cardDAO = DAOFactory.createCardDAO(LocationUpdateService.this.getApplicationContext());
             for (com.tenforwardconsulting.cordova.bgloc.data.Card savedGeoCard : cardDAO.geoPendingCards()) {
