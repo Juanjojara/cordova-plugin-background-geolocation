@@ -840,37 +840,43 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private boolean shareCard(com.tenforwardconsulting.cordova.bgloc.data.Card geoCard){
-        params.remove("LocationSetting");
-        params.remove("SharingSetting");
-        params.remove("UserId");
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-        HttpPost request = new HttpPost(url);
+        try {
+            params.remove("LocationSetting");
+            params.remove("SharingSetting");
+            params.remove("UserId");
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost request = new HttpPost(url);
 
-        //Proces for creating the card on the server
-        params.put("info", geoCard.getInfo());
-        params.put("lat", geoCard.getLatitude());
-        params.put("lon", geoCard.getLongitude());
-        params.put("location", geoCard.getLocation());
-        params.put("timestamp", geoCard.getCreated());
+            //Proces for creating the card on the server
+            params.put("info", geoCard.getInfo());
+            params.put("lat", geoCard.getLatitude());
+            params.put("lon", geoCard.getLongitude());
+            params.put("location", geoCard.getLocation());
+            params.put("timestamp", geoCard.getCreated());
 
-        StringEntity se = new StringEntity(params.toString());
-        request.setEntity(se);
-        request.setHeader("Content-type", "application/json");
+            StringEntity se = new StringEntity(params.toString());
+            request.setEntity(se);
+            request.setHeader("Content-type", "application/json");
 
-        Iterator<String> headkeys = headers.keys();
-        while( headkeys.hasNext() ){
-            String headkey = headkeys.next();
-            if(headkey != null) {
-                Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
-                request.setHeader(headkey, (String)headers.getString(headkey));
+            Iterator<String> headkeys = headers.keys();
+            while( headkeys.hasNext() ){
+                String headkey = headkeys.next();
+                if(headkey != null) {
+                    Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
+                    request.setHeader(headkey, (String)headers.getString(headkey));
+                }
             }
-        }
-        Log.d(TAG, "Posting to " + request.getURI().toString());
-        HttpResponse response = httpClient.execute(request);
-        Log.i(TAG, "Response received: " + response.getStatusLine());
-        if ((response.getStatusLine().getStatusCode() == 200) || (response.getStatusLine().getStatusCode() == 204)) {
-            return true;
-        } else {
+            Log.d(TAG, "Posting to " + request.getURI().toString());
+            HttpResponse response = httpClient.execute(request);
+            Log.i(TAG, "Response received: " + response.getStatusLine());
+            if ((response.getStatusLine().getStatusCode() == 200) || (response.getStatusLine().getStatusCode() == 204)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Throwable e) {
+            Log.w(TAG, "Exception sharing card: " + e);
+            e.printStackTrace();
             return false;
         }
     }
