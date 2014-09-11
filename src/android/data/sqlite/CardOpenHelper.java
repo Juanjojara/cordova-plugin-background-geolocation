@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class CardOpenHelper extends SQLiteOpenHelper {
-    private static final String SQLITE_DATABASE_NAME = "dbLifeshare";
+    private static final String SQLITE_DATABASE_NAME = "dbLifeshare.db";
     private static final int DATABASE_VERSION = 1;
 
     CardOpenHelper(Context context) {
