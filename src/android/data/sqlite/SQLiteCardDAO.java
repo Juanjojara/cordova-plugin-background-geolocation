@@ -144,6 +144,11 @@ public class SQLiteCardDAO implements CardDAO {
 		db.endTransaction();
 		db.close();
 	}
+
+	public void closeDB(){
+		CardOpenHelper cardOH = new CardOpenHelper(context);
+		cardOH.close();
+	}
 	
 	private Card hydrate(Cursor c) {
 		Card card = new Card();

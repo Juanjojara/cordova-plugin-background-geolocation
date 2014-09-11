@@ -1035,6 +1035,8 @@ public class LocationUpdateService extends Service implements LocationListener {
         alarmManager.cancel(stationaryAlarmPI);
         alarmManager.cancel(stationaryLocationPollingPI);
         toneGenerator.release();
+        CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
+        cdao.close();
         
         unregisterReceiver(stationaryAlarmReceiver);
         unregisterReceiver(singleUpdateReceiver);

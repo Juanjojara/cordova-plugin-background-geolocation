@@ -6,4 +6,5 @@ public interface CardDAO {
 	public int getCardId();
 	public boolean persistCard(String table, Card card);
 	public void deleteCard(String tableName, Card card);
+	public void closeDB();
 }
