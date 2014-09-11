@@ -64,7 +64,7 @@ public class SQLiteCardDAO implements CardDAO {
         int internetCards = cursor.getInt(cursor.getColumnIndex("countPendings"));
         cursor.close();
  		db.close();
- 		
+
  		SharedPreferences.Editor edit = pref.edit();
  		if (internetCards > 0){
  			edit.putBoolean("pendingInternet", true);
@@ -85,7 +85,7 @@ public class SQLiteCardDAO implements CardDAO {
 		cursor.moveToFirst();
         int currentId = cursor.getInt(cursor.getColumnIndex("id"));
         cursor.close();
-        db.close
+        db.close();
 
         //UPDATE ID
         ContentValues args = new ContentValues();
