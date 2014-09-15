@@ -82,7 +82,8 @@ public class SQLiteCardDAO implements CardDAO {
 
         SharedPreferences.Editor edit = pref.edit();
         edit.putInt("cardId", currentId+1);
-
+        edit.commit();
+        
  		return currentId;
     }
 
