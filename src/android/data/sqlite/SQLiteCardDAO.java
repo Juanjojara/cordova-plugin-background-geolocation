@@ -92,7 +92,7 @@ public class SQLiteCardDAO implements CardDAO {
 			db.beginTransaction();
 			ContentValues values = getContentValues(card);
 			rowId = db.insert(tableName, null, values);
-			Log.d(TAG, "After insert, rowId = " + rowId);
+			Log.d(TAG, "After insert, rowId = " + rowId + ". Card ID: " + card.getId() + ". Table: " + tableName);
 			db.setTransactionSuccessful();
 			db.endTransaction();
 			db.close();
