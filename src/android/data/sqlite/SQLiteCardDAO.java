@@ -86,16 +86,20 @@ public class SQLiteCardDAO implements CardDAO {
 
 	public boolean persistCard(String tableName, Card card) {
 		Log.d(TAG, "AAAA");
-		SQLiteDatabase db = new CardOpenHelper(context).getWritableDatabase();
-		db.beginTransaction();
-		ContentValues values = getContentValues(card);
-		long rowId = db.insert(tableName, null, values);
-		Log.d(TAG, "After insert, rowId = " + rowId);
-		db.setTransactionSuccessful();
-		db.endTransaction();
-        Log.d(TAG, "BBBB");
-		db.close();
-		
+		try {
+			SQLiteDatabase db = new CardOpenHelper(context).getWritableDatabase();
+			db.beginTransaction();
+			ContentValues values = getContentValues(card);
+			long rowId = db.insert(tableName, null, values);
+			Log.d(TAG, "After insert, rowId = " + rowId);
+			db.setTransactionSuccessful();
+			db.endTransaction();
+			db.close();
+		} catch (Exception e) {
+        	Log.d(TAG, "ERROR "+e.toString());
+		}
+		Log.d(TAG, "BBBB");
+
 		if (rowId > -1) {
 			return true;
 		} else {
