@@ -36,7 +36,6 @@ public class SQLiteCardDAO implements CardDAO {
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 		String user_id = pref.getString("user_id", "");
 		try {
-			//db = openDatabase("dbLifeshare.db");
 			db = new CardOpenHelper(context).getReadableDatabase();
 			c = db.query("pending_geo", new String[]{"id", "created", "info", "location", "latitude", "longitude", "sharing_level", "location_level", "user_id", "confirm"}, "user_id = ?", new String[]{user_id}, null, null, "id");
 			while (c.moveToNext()) {
@@ -57,7 +56,6 @@ public class SQLiteCardDAO implements CardDAO {
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 		String user_id = pref.getString("user_id", "");
         String countQuery = "SELECT count(id) countPendings FROM pending_geo WHERE user_id = ?";
-        //SQLiteDatabase db = openDatabase("dbLifeshare.db");
         SQLiteDatabase db = new CardOpenHelper(context).getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, new String[]{user_id});
 		cursor.moveToFirst();
@@ -77,47 +75,17 @@ public class SQLiteCardDAO implements CardDAO {
 
     //			INSERT IN BRIDGE
     public int getCardId() {
-        //SQLiteDatabase db = openDatabase("dbLifeshare.db");
-        SQLiteDatabase db = new CardOpenHelper(context).getReadableDatabase();
-        //GET CURRENT ID
-        String idQuery = "SELECT id FROM bridge";
-        Cursor cursor = db.rawQuery(idQuery, null);
-		cursor.moveToFirst();
-        int currentId = cursor.getInt(cursor.getColumnIndex("id"));
-        cursor.close();
-        db.close();
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        int currentId = pref.getInt("cardId", 1);
 
-        //UPDATE ID
-        ContentValues args = new ContentValues();
-		args.put("id", currentId+1);
-        db = new CardOpenHelper(context).getWritableDatabase();
-        db.beginTransaction();
-        int updRows = db.update("bridge", args, null, null);
- 		db.setTransactionSuccessful();
-		db.endTransaction();
-		db.close();
- 		Log.i(TAG, "ID = " + (currentId+1) + " Rows affected = " + updRows);
+        SharedPreferences.Editor edit = pref.edit();
+        edit.putInt("cardId", currentId+1);
 
  		return currentId;
     }
 
-    private SQLiteDatabase openDatabase(String dbname) {
-        File dbfile = context.getDatabasePath(dbname);
-
-        if (!dbfile.exists()) {
-            dbfile.getParentFile().mkdirs();
-        }
-
-        Log.v("info", "Open sqlite db: " + dbfile.getAbsolutePath());
-
-        SQLiteDatabase mydb = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
-
-        return mydb;
-    }
-
 	public boolean persistCard(String tableName, Card card) {
 		Log.d(TAG, "AAAA");
-        //SQLiteDatabase db = openDatabase("dbLifeshare.db");
 		SQLiteDatabase db = new CardOpenHelper(context).getWritableDatabase();
 		db.beginTransaction();
 		ContentValues values = getContentValues(card);
@@ -137,7 +105,6 @@ public class SQLiteCardDAO implements CardDAO {
 
 	public void deleteCard(String tableName, Card card) {
 		SQLiteDatabase db = new CardOpenHelper(context).getWritableDatabase();
-		//SQLiteDatabase db = openDatabase("dbLifeshare.db");
 		db.beginTransaction();
 		db.delete(tableName, "id = ?", new String[]{Integer.toString(card.getId())});
 		db.setTransactionSuccessful();
