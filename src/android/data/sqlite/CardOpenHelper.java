@@ -28,6 +28,7 @@ public class CardOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        db.setMaximumSize(1*1024*512);
         db.execSQL(PENDING_GEO_TABLE_CREATE);
         db.execSQL(PENDING_CONFIRM_TABLE_CREATE);
         db.execSQL(PENDING_INTERNET_TABLE_CREATE);

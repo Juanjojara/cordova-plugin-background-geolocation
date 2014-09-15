@@ -679,7 +679,8 @@ public class LocationUpdateService extends Service implements LocationListener {
                 HttpPost request = new HttpPost(url);
 
                 //Get user settings for creating and sharing a card
-                SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+                //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+                SharedPreferences pref = mContext.getSharedPreferences("lifesharePreferences", MODE_MULTI_PROCESS);
                 String location_setting = pref.getString("location_setting", "");
                 String sharing_setting = pref.getString("sharing_setting", "");
                 String user_id = pref.getString("user_id", "");
@@ -764,7 +765,8 @@ public class LocationUpdateService extends Service implements LocationListener {
                 Log.i(TAG, "Posting  native card: " + geoCard);
                 
                 //Get user settings for creating and sharing a card
-                SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+                SharedPreferences pref = mContext.getSharedPreferences("lifesharePreferences", MODE_MULTI_PROCESS);
+                //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
                 String location_setting = pref.getString("location_setting", "");
                 String sharing_setting = pref.getString("sharing_setting", "");
                 String user_id = pref.getString("user_id", "");
@@ -980,7 +982,8 @@ public class LocationUpdateService extends Service implements LocationListener {
         CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
         //com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
         //Store settings variables passed during the initial configuration of the service
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+        //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+        SharedPreferences pref = this.getApplicationContext().getSharedPreferences("lifesharePreferences", MODE_MULTI_PROCESS);
         SharedPreferences.Editor edit = pref.edit();
         String user_id = "";
         String location_setting = "";

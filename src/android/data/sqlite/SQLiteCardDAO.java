@@ -33,7 +33,8 @@ public class SQLiteCardDAO implements CardDAO {
 		SQLiteDatabase db = null;
 		Cursor c = null;
 		List<Card> all = new ArrayList<Card>();
-		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+		//SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences pref = context.getSharedPreferences("lifesharePreferences", MODE_MULTI_PROCESS);
 		String user_id = pref.getString("user_id", "");
 		try {
 			db = new CardOpenHelper(context).getReadableDatabase();
@@ -53,7 +54,8 @@ public class SQLiteCardDAO implements CardDAO {
 	}
 
 	public void geoCards() {
-		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+		//SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences pref = context.getSharedPreferences("lifesharePreferences", MODE_MULTI_PROCESS);
 		String user_id = pref.getString("user_id", "");
         String countQuery = "SELECT count(id) countPendings FROM pending_geo WHERE user_id = ?";
         SQLiteDatabase db = new CardOpenHelper(context).getReadableDatabase();
@@ -75,7 +77,7 @@ public class SQLiteCardDAO implements CardDAO {
 
     //			INSERT IN BRIDGE
     public int getCardId() {
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences pref = context.getSharedPreferences("lifesharePreferences", MODE_MULTI_PROCESS);
         int currentId = pref.getInt("cardId", 1);
 
         SharedPreferences.Editor edit = pref.edit();
