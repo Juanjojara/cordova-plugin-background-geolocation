@@ -86,11 +86,12 @@ public class SQLiteCardDAO implements CardDAO {
 
 	public boolean persistCard(String tableName, Card card) {
 		Log.d(TAG, "AAAA");
+		long rowId = -1;
 		try {
 			SQLiteDatabase db = new CardOpenHelper(context).getWritableDatabase();
 			db.beginTransaction();
 			ContentValues values = getContentValues(card);
-			long rowId = db.insert(tableName, null, values);
+			rowId = db.insert(tableName, null, values);
 			Log.d(TAG, "After insert, rowId = " + rowId);
 			db.setTransactionSuccessful();
 			db.endTransaction();
