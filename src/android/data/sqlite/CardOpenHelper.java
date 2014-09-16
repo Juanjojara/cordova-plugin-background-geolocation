@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class CardOpenHelper extends SQLiteOpenHelper {
-    private static final String SQLITE_DATABASE_NAME = "dbLifeshare.db";
+    private static final String SQLITE_DATABASE_NAME = "lifeshare_bg_cards";
     private static final int DATABASE_VERSION = 1;
 
     private static final String PENDING_GEO_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS pending_geo (id INTEGER PRIMARY KEY, created, info, location, latitude, longitude, sharing_level, location_level, user_id, confirm)";
