@@ -888,6 +888,9 @@ public class LocationUpdateService extends Service implements LocationListener {
         shareLocBuilder.setContentTitle("Lifeshare");
         shareLocBuilder.setContentText(info + " " + loc);
         shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
+
+        shareLocBuilder.addAction(android.R.drawable.ic_menu_mark, "Confirm", pendingIntentCancel);
+        shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", pendingIntentCancel);
         //shareLocBuilder.setContentIntent(pendingIntent);
         Notification shareNotification;
         if (android.os.Build.VERSION.SDK_INT >= 16) {
@@ -900,7 +903,18 @@ public class LocationUpdateService extends Service implements LocationListener {
         NotificationManager mNotificationManager = (NotificationManager)
                 getSystemService(NOTIFICATION_SERVICE);
             // Including the notification ID allows you to update the notification later on.
-        mNotificationManager.notify(123, shareNotification);
+        mNotificationManager.notify(getNotificationId(), shareNotification);
+    }
+
+    private int getNotificationId() {
+        SharedPreferences pref = context.getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);
+        int currentNotId = pref.getInt("notificationId", 1);
+
+        SharedPreferences.Editor edit = pref.edit();
+        edit.putInt("notificationId", currentNotId+1);
+        edit.commit();
+        
+        return currentNotId;
     }
 
     private String getInfo(){
