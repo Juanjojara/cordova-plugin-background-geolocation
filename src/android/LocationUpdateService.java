@@ -904,12 +904,19 @@ public class LocationUpdateService extends Service implements LocationListener {
         //Intent notificationServiceIntent;
         //notificationServiceIntent = new Intent(this, LifeshareNotificationService.class);
         //PendingIntent pintent = PendingIntent.getService(mContext, 0, notificationServiceIntent, 0);
+        Intent dismissIntent = new Intent("discard");
+        PendingIntent piDismiss = PendingIntent.getService(this, 0, dismissIntent, 0);
+
+        Intent snoozeIntent = new Intent("confirm");
+        PendingIntent piSnooze = PendingIntent.getService(this, 0, snoozeIntent, 0);
 
         Notification.Builder shareLocBuilder = new Notification.Builder(this);
         shareLocBuilder.setContentTitle("Lifeshare Card");
         shareLocBuilder.setContentText(info + " " + loc);
         shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
 
+        shareLocBuilder.addAction(R.drawable.ic_stat_dismiss, "Discard", piDismiss)
+        shareLocBuilder.addAction(R.drawable.ic_stat_snooze, "Confirm", piSnooze);
         //shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", notificationConfirmPI);
         //shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", notificationConfirmPI);
         shareLocBuilder.setContentIntent(notificationConfirmPI);
