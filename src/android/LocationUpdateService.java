@@ -906,20 +906,21 @@ public class LocationUpdateService extends Service implements LocationListener {
         //PendingIntent pintent = PendingIntent.getService(mContext, 0, notificationServiceIntent, 0);
 
         Notification.Builder shareLocBuilder = new Notification.Builder(this);
-        shareLocBuilder.setContentTitle("Lifeshare");
+        shareLocBuilder.setContentTitle("Lifeshare Card");
         shareLocBuilder.setContentText(info + " " + loc);
         shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
 
         shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", notificationConfirmPI);
         shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", notificationConfirmPI);
-        //shareLocBuilder.setContentIntent(pendingIntent);
+        shareLocBuilder.setContentIntent(notificationConfirmPI);
         Notification shareNotification;
         if (android.os.Build.VERSION.SDK_INT >= 16) {
             shareNotification = buildForegroundNotification(shareLocBuilder);
         } else {
             shareNotification = buildForegroundNotificationCompat(shareLocBuilder);
         }
-        shareNotification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
+        //shareNotification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
+        shareNotification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE;
 
         NotificationManager mNotificationManager = (NotificationManager)
                 getSystemService(NOTIFICATION_SERVICE);
