@@ -915,6 +915,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         shareLocBuilder.setContentText(info + " " + loc);
         shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
 
+        shareLocBuilder.setStyle(new Notification.BigTextStyle().bigText("test message big"));
         shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Discard", piDismiss);
         shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Confirm", piSnooze);
         //shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", notificationConfirmPI);
