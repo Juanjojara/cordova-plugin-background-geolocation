@@ -928,7 +928,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private int getNotificationId() {
-        SharedPreferences pref = context.getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);
+        SharedPreferences pref = mContext.getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);
         int currentNotId = pref.getInt("notificationId", 1);
 
         SharedPreferences.Editor edit = pref.edit();
