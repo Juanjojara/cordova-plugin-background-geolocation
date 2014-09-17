@@ -74,6 +74,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private static final String STATIONARY_ALARM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
     private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
     private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
+    private static final String NOTIFICATION_CONFIRM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.NOTIFICATION_CONFIRM_ACTION";
     private static final long STATIONARY_TIMEOUT                                = 5 * 1000 * 60;    // 5 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_LAZY         = 3 * 1000 * 60;    // 3 minutes.  
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE   = 1 * 1000 * 60;    // 1 minute.
@@ -97,6 +98,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private long stationaryLocationPollingInterval;
     private PendingIntent stationaryRegionPI;
     private PendingIntent singleUpdatePI;
+    private PendingIntent notificationConfirmPI;
     
     private Boolean isMoving = false;
     private Boolean isAcquiringStationaryLocation = false;
@@ -156,6 +158,10 @@ public class LocationUpdateService extends Service implements LocationListener {
         // One-shot PI (TODO currently unused)  
         singleUpdatePI = PendingIntent.getBroadcast(this, 0, new Intent(SINGLE_LOCATION_UPDATE_ACTION), PendingIntent.FLAG_CANCEL_CURRENT);
         registerReceiver(singleUpdateReceiver, new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION));
+        
+        // Notification Confirm Monitor PI
+        notificationConfirmPI   = PendingIntent.getBroadcast(this, 0, new Intent(NOTIFICATION_CONFIRM_ACTION), 0);
+        registerReceiver(notificatinConfirmReceiver, new IntentFilter(NOTIFICATION_CONFIRM_ACTION));
         
         ////
         // DISABLED
@@ -634,6 +640,17 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
     };
     /**
+    * Listen to Notification actions
+    */
+    private BroadcastReceiver notificatinConfirmReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            Log.i(TAG, "- ACTION CLICKED");
+            //setPace(false);
+        }
+    };
+    /**
     * TODO Experimental, hoping to implement some sort of "significant changes" system here like ios based upon cell-tower changes.
     */
     private PhoneStateListener phoneStateListener = new PhoneStateListener() {
@@ -884,13 +901,17 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private void postNotification(String info, String loc){
+        //Intent notificationServiceIntent;
+        //notificationServiceIntent = new Intent(this, LifeshareNotificationService.class);
+        //PendingIntent pintent = PendingIntent.getService(mContext, 0, notificationServiceIntent, 0);
+
         Notification.Builder shareLocBuilder = new Notification.Builder(this);
         shareLocBuilder.setContentTitle("Lifeshare");
         shareLocBuilder.setContentText(info + " " + loc);
         shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
 
-        shareLocBuilder.addAction(android.R.drawable.ic_menu_mark, "Confirm", pendingIntentCancel);
-        shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", pendingIntentCancel);
+        shareLocBuilder.addAction(android.R.drawable.ic_menu_mark, "Confirm", notificationConfirmPI);
+        shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", notificationConfirmPI);
         //shareLocBuilder.setContentIntent(pendingIntent);
         Notification shareNotification;
         if (android.os.Build.VERSION.SDK_INT >= 16) {
@@ -1059,6 +1080,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         unregisterReceiver(singleUpdateReceiver);
         unregisterReceiver(stationaryRegionReceiver);
         unregisterReceiver(stationaryLocationMonitorReceiver);
+        unregisterReceiver(notificatinConfirmReceiver);
         
         if (stationaryLocation != null && !isMoving) {
             try {
