@@ -75,6 +75,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
     private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
     private static final String NOTIFICATION_CONFIRM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.NOTIFICATION_CONFIRM_ACTION";
+    private static final String NOTIFICATION_DISCARD_ACTION         = "com.tenforwardconsulting.cordova.bgloc.NOTIFICATION_DISCARD_ACTION";
     private static final long STATIONARY_TIMEOUT                                = 5 * 1000 * 60;    // 5 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_LAZY         = 3 * 1000 * 60;    // 3 minutes.  
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE   = 1 * 1000 * 60;    // 1 minute.
@@ -99,6 +100,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private PendingIntent stationaryRegionPI;
     private PendingIntent singleUpdatePI;
     private PendingIntent notificationConfirmPI;
+    private PendingIntent notificationDiscardPI;
     
     private Boolean isMoving = false;
     private Boolean isAcquiringStationaryLocation = false;
@@ -162,6 +164,10 @@ public class LocationUpdateService extends Service implements LocationListener {
         // Notification Confirm Monitor PI
         notificationConfirmPI   = PendingIntent.getBroadcast(this, 0, new Intent(NOTIFICATION_CONFIRM_ACTION), 0);
         registerReceiver(notificatinConfirmReceiver, new IntentFilter(NOTIFICATION_CONFIRM_ACTION));
+
+        // Notification Discard Monitor PI
+        notificationDiscardPI   = PendingIntent.getBroadcast(this, 0, new Intent(NOTIFICATION_DISCARD_ACTION), 0);
+        registerReceiver(notificatinDiscardReceiver, new IntentFilter(NOTIFICATION_DISCARD_ACTION));
         
         ////
         // DISABLED
@@ -640,13 +646,24 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
     };
     /**
-    * Listen to Notification actions
+    * Listen to Notification confirmation action
     */
     private BroadcastReceiver notificatinConfirmReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            Log.i(TAG, "- ACTION CLICKED");
+            Log.i(TAG, "- CONFIRMED CARD ACTION");
+            //setPace(false);
+        }
+    };
+    /**
+    * Listen to Notification discarding action
+    */
+    private BroadcastReceiver notificatinDiscardReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            Log.i(TAG, "- DISCARDED CARD ACTION");
             //setPace(false);
         }
     };
@@ -904,23 +921,23 @@ public class LocationUpdateService extends Service implements LocationListener {
         //Intent notificationServiceIntent;
         //notificationServiceIntent = new Intent(this, LifeshareNotificationService.class);
         //PendingIntent pintent = PendingIntent.getService(mContext, 0, notificationServiceIntent, 0);
-        Intent dismissIntent = new Intent("discard");
-        PendingIntent piDismiss = PendingIntent.getService(this, 0, dismissIntent, 0);
+        //Intent dismissIntent = new Intent("discard");
+        //PendingIntent piDismiss = PendingIntent.getService(this, 0, dismissIntent, 0);
 
-        Intent snoozeIntent = new Intent("confirm");
-        PendingIntent piSnooze = PendingIntent.getService(this, 0, snoozeIntent, 0);
+        //Intent snoozeIntent = new Intent("confirm");
+        //PendingIntent piSnooze = PendingIntent.getService(this, 0, snoozeIntent, 0);
 
         Notification.Builder shareLocBuilder = new Notification.Builder(this);
         shareLocBuilder.setContentTitle("Lifeshare Card");
         shareLocBuilder.setContentText(info + " " + loc);
         shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
 
-        shareLocBuilder.setStyle(new Notification.BigTextStyle().bigText("test message big"));
+        /*shareLocBuilder.setStyle(new Notification.BigTextStyle().bigText("test message big"));
         shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Discard", piDismiss);
-        shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Confirm", piSnooze);
-        //shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", notificationConfirmPI);
-        //shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", notificationConfirmPI);
-        shareLocBuilder.setContentIntent(notificationConfirmPI);
+        shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Confirm", piSnooze);*/
+        shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", notificationConfirmPI);
+        shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", notificationDiscardPI);
+        //shareLocBuilder.setContentIntent(notificationConfirmPI);
         Notification shareNotification;
         if (android.os.Build.VERSION.SDK_INT >= 16) {
             shareNotification = buildForegroundNotification(shareLocBuilder);
@@ -1090,6 +1107,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         unregisterReceiver(stationaryRegionReceiver);
         unregisterReceiver(stationaryLocationMonitorReceiver);
         unregisterReceiver(notificatinConfirmReceiver);
+        unregisterReceiver(notificatinDiscardReceiver);
         
         if (stationaryLocation != null && !isMoving) {
             try {
