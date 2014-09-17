@@ -915,7 +915,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         shareLocBuilder.setContentText(info + " " + loc);
         shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
 
-        shareLocBuilder.addAction(R.drawable.ic_stat_dismiss, "Discard", piDismiss)
+        shareLocBuilder.addAction(R.drawable.ic_stat_dismiss, "Discard", piDismiss);
         shareLocBuilder.addAction(R.drawable.ic_stat_snooze, "Confirm", piSnooze);
         //shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", notificationConfirmPI);
         //shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", notificationConfirmPI);
@@ -929,8 +929,6 @@ public class LocationUpdateService extends Service implements LocationListener {
         //shareNotification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
         shareNotification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE;
 
-        shareNotification.addAction(android.R.drawable.ic_menu_agenda, "Confirm", notificationConfirmPI);
-        shareNotification.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", notificationConfirmPI);
         NotificationManager mNotificationManager = (NotificationManager)
                 getSystemService(NOTIFICATION_SERVICE);
             // Including the notification ID allows you to update the notification later on.
