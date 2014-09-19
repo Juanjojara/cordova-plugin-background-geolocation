@@ -664,6 +664,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         public void onReceive(Context context, Intent intent)
         {
             Log.i(TAG, "- DISCARDED CARD ACTION");
+            NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
             //setPace(false);
         }
     };
@@ -932,12 +933,8 @@ public class LocationUpdateService extends Service implements LocationListener {
         shareLocBuilder.setContentText(info + " " + loc);
         shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
 
-        /*shareLocBuilder.setStyle(new Notification.BigTextStyle().bigText("test message big"));
-        shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Discard", piDismiss);
-        shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Confirm", piSnooze);*/
         shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", notificationConfirmPI);
         shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", notificationDiscardPI);
-        //shareLocBuilder.setContentIntent(notificationConfirmPI);
         Notification shareNotification;
         if (android.os.Build.VERSION.SDK_INT >= 16) {
             shareNotification = buildForegroundNotification(shareLocBuilder);
