@@ -168,7 +168,7 @@ public class LocationUpdateService extends Service implements LocationListener {
 
         // Notification Discard Monitor PI
         //notificationDiscardPI   = PendingIntent.getBroadcast(this, 0, new Intent(NOTIFICATION_DISCARD_ACTION), 0);
-        registerReceiver(notificatinDiscardReceiver, new IntentFilter(NOTIFICATION_DISCARD_ACTION));
+        //registerReceiver(notificatinDiscardReceiver, new IntentFilter(NOTIFICATION_DISCARD_ACTION));
         
         ////
         // DISABLED
@@ -857,7 +857,8 @@ public class LocationUpdateService extends Service implements LocationListener {
         shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", notificationConfirmPI);
 
         int notifiId = getNotificationId();
-        Intent notificationDiscardIntent = new Intent(NOTIFICATION_DISCARD_ACTION);
+        Intent notificationDiscardIntent = new Intent(NOTIFICATION_DISCARD_ACTION+notifiId);
+        registerReceiver(notificatinDiscardReceiver, new IntentFilter(NOTIFICATION_DISCARD_ACTION+notifiId));
         notificationDiscardIntent.putExtra(NOTIFICATION_ARG_ID, notifiId);
         PendingIntent piDismiss = PendingIntent.getBroadcast(this, 0, notificationDiscardIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         //piDismiss.putExtra(NOTIFICATION_ARG_ID, notifiId);
