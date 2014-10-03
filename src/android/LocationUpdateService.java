@@ -859,7 +859,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         int notifiId = getNotificationId();
         Intent notificationDiscardIntent = new Intent(NOTIFICATION_DISCARD_ACTION);
         notificationDiscardIntent.putExtra(NOTIFICATION_ARG_ID, notifiId);
-        PendingIntent piDismiss = PendingIntent.getBroadcast(this, 0, notificationDiscardIntent, 0);
+        PendingIntent piDismiss = PendingIntent.getBroadcast(this, 0, notificationDiscardIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         //piDismiss.putExtra(NOTIFICATION_ARG_ID, notifiId);
         
         shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", piDismiss);
