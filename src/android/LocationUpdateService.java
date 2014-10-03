@@ -76,6 +76,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
     private static final String NOTIFICATION_CONFIRM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.NOTIFICATION_CONFIRM_ACTION";
     private static final String NOTIFICATION_DISCARD_ACTION         = "com.tenforwardconsulting.cordova.bgloc.NOTIFICATION_DISCARD_ACTION";
+    private static final String NOTIFICATION_ARG_ID =           "NOTIF_ID";
     private static final long STATIONARY_TIMEOUT                                = 5 * 1000 * 60;    // 5 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_LAZY         = 3 * 1000 * 60;    // 3 minutes.  
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE   = 1 * 1000 * 60;    // 1 minute.
@@ -100,7 +101,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private PendingIntent stationaryRegionPI;
     private PendingIntent singleUpdatePI;
     private PendingIntent notificationConfirmPI;
-    private PendingIntent notificationDiscardPI;
+    //private PendingIntent notificationDiscardPI;
     
     private Boolean isMoving = false;
     private Boolean isAcquiringStationaryLocation = false;
@@ -166,7 +167,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         registerReceiver(notificatinConfirmReceiver, new IntentFilter(NOTIFICATION_CONFIRM_ACTION));
 
         // Notification Discard Monitor PI
-        notificationDiscardPI   = PendingIntent.getBroadcast(this, 0, new Intent(NOTIFICATION_DISCARD_ACTION), 0);
+        //notificationDiscardPI   = PendingIntent.getBroadcast(this, 0, new Intent(NOTIFICATION_DISCARD_ACTION), 0);
         registerReceiver(notificatinDiscardReceiver, new IntentFilter(NOTIFICATION_DISCARD_ACTION));
         
         ////
@@ -664,7 +665,15 @@ public class LocationUpdateService extends Service implements LocationListener {
         public void onReceive(Context context, Intent intent)
         {
             Log.i(TAG, "- DISCARDED CARD ACTION");
-            NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+            
+            try {
+                int notificationId = intent.getIntExtra(NOTIFICATION_ARG_ID, -1);
+                Log.i(TAG, "- NOTIFICATION CARD ID" + notificationId);
+            } catch (Throwable e) {
+                Log.w(TAG, "- Something bad happened while getting ID");
+            }
+
+            //NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
             //setPace(false);
         }
     };
@@ -700,95 +709,6 @@ public class LocationUpdateService extends Service implements LocationListener {
         else
             task.execute();
         Log.d(TAG, "afterexecute " +  task.getStatus());
-    }
-
-    private boolean postLocation(com.tenforwardconsulting.cordova.bgloc.data.Location l) {
-        if (l == null) {
-            Log.w(TAG, "postLocation: null location");
-            return false;
-        }else{
-            try {
-                lastUpdateTime = SystemClock.elapsedRealtime();
-                Log.i(TAG, "Posting  native location update: " + l);
-                DefaultHttpClient httpClient = new DefaultHttpClient();
-                HttpPost request = new HttpPost(url);
-
-                //Get user settings for creating and sharing a card
-                //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
-                SharedPreferences pref = mContext.getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);
-                String location_setting = pref.getString("location_setting", "");
-                String sharing_setting = pref.getString("sharing_setting", "");
-                String user_id = pref.getString("user_id", "");
-                params.remove("LocationSetting");
-                params.remove("SharingSetting");
-                params.remove("UserId");
-
-                String curAdd = getAddress(Double.parseDouble(l.getLatitude()), Double.parseDouble(l.getLongitude()), location_setting);
-                if (curAdd == null){
-                    if (isNetworkConnected()){
-                        postNotification("Error", "Please reset your device and start the application again");
-                    }
-                    return false;                    
-                }
-                String curInfo = getInfo();
-
-                //Control to avoid creating redundant cards
-                SharedPreferences.Editor edit = pref.edit();
-
-                String lastAdd = pref.getString("lastAddress", "");
-                String lastInfo = pref.getString("lastInfo", "");
-
-                //edit.putString("user_id", user_id);
-                //edit.commit();
-                Log.i(TAG, "saving in prefs");
-                if (curAdd.equals(lastAdd) && curInfo.equals(lastInfo)){
-                    Log.i(TAG, "repeated card");
-                    postNotification(curInfo, curAdd + " (Not shared)");
-                    return true;
-                }else{
-                    Log.i(TAG, "new card");
-                    edit.putString("lastAddress", curAdd);
-                    edit.putString("lastInfo", curInfo);
-                    edit.commit();
-                }
-
-                //Create a notification if necessary
-                if (sharing_setting.equals("confirm")){
-                    postNotification(curInfo, curAdd);
-                }
-
-                //Proces for creating the card on the server
-                params.put("info", curInfo);
-                params.put("lat", l.getLatitude());
-                params.put("lon", l.getLongitude());
-                params.put("location", curAdd);
-
-                StringEntity se = new StringEntity(params.toString());
-                request.setEntity(se);
-                request.setHeader("Content-type", "application/json");
-
-                Iterator<String> headkeys = headers.keys();
-                while( headkeys.hasNext() ){
-                    String headkey = headkeys.next();
-                    if(headkey != null) {
-                        Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
-                        request.setHeader(headkey, (String)headers.getString(headkey));
-                    }
-                }
-                Log.d(TAG, "Posting to " + request.getURI().toString());
-                HttpResponse response = httpClient.execute(request);
-                Log.i(TAG, "Response received: " + response.getStatusLine());
-                if ((response.getStatusLine().getStatusCode() == 200) || (response.getStatusLine().getStatusCode() == 204)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } catch (Throwable e) {
-                Log.w(TAG, "Exception posting location: " + e);
-                e.printStackTrace();
-                return false;
-            }
-        }
     }
 
     private boolean postCard(com.tenforwardconsulting.cordova.bgloc.data.Card geoCard) {
@@ -934,7 +854,15 @@ public class LocationUpdateService extends Service implements LocationListener {
         shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
 
         shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", notificationConfirmPI);
-        shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", notificationDiscardPI);
+
+        int notifiId = getNotificationId();
+        Intent notificationDiscardIntent = new Intent(NOTIFICATION_DISCARD_ACTION);
+        notificationDiscardIntent.putExtra(NOTIFICATION_ARG_ID, notifiId);
+        PendingIntent piDismiss = PendingIntent.getBroadcast(this, 0, notificationDiscardIntent, 0);
+        //piDismiss.putExtra(NOTIFICATION_ARG_ID, notifiId);
+        
+        shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", piDismiss);
+        //shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", notificationDiscardPI);
         Notification shareNotification;
         if (android.os.Build.VERSION.SDK_INT >= 16) {
             shareNotification = buildForegroundNotification(shareLocBuilder);
@@ -947,7 +875,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         NotificationManager mNotificationManager = (NotificationManager)
                 getSystemService(NOTIFICATION_SERVICE);
             // Including the notification ID allows you to update the notification later on.
-        mNotificationManager.notify(getNotificationId(), shareNotification);
+        mNotificationManager.notify(notifiId, shareNotification);
     }
 
     private int getNotificationId() {
@@ -1129,14 +1057,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         @Override
         protected Boolean doInBackground(Object...objects) {
             Log.d(TAG, "Executing PostLocationTask#doInBackground");
-            /*LocationDAO locationDAO = DAOFactory.createLocationDAO(LocationUpdateService.this.getApplicationContext());
-            for (com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation : locationDAO.getAllLocations()) {
-                Log.d(TAG, "Posting saved location");
-                if (postLocation(savedLocation)) {
-                    locationDAO.deleteLocation(savedLocation);
-                }
-            }*/
-            Log.i(TAG, "1111 Post Location");
+            Log.i(TAG, "1111 Post saved card");
             CardDAO cardDAO = DAOFactory.createCardDAO(LocationUpdateService.this.getApplicationContext());
             for (com.tenforwardconsulting.cordova.bgloc.data.Card savedGeoCard : cardDAO.geoPendingCards()) {
                 Log.d(TAG, "Posting saved card");
@@ -1144,7 +1065,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                     cardDAO.deleteCard("pending_geo", savedGeoCard);
                 }
             }
-            Log.i(TAG, "9999 Post Location");
+            Log.i(TAG, "9999 Post saved card");
             return true;
         }
         @Override
