@@ -102,6 +102,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private PendingIntent singleUpdatePI;
     private PendingIntent notificationConfirmPI;
     //private PendingIntent notificationDiscardPI;
+    private IntentFilter notificationFilter;
     
     private Boolean isMoving = false;
     private Boolean isAcquiringStationaryLocation = false;
@@ -169,6 +170,8 @@ public class LocationUpdateService extends Service implements LocationListener {
         // Notification Discard Monitor PI
         //notificationDiscardPI   = PendingIntent.getBroadcast(this, 0, new Intent(NOTIFICATION_DISCARD_ACTION), 0);
         //registerReceiver(notificatinDiscardReceiver, new IntentFilter(NOTIFICATION_DISCARD_ACTION));
+        notificationFilter = new IntentFilter();
+        registerReceiver(notificatinDiscardReceiver, notificationFilter);
         
         ////
         // DISABLED
@@ -858,7 +861,8 @@ public class LocationUpdateService extends Service implements LocationListener {
 
         int notifiId = getNotificationId();
         Intent notificationDiscardIntent = new Intent(NOTIFICATION_DISCARD_ACTION+notifiId);
-        registerReceiver(notificatinDiscardReceiver, new IntentFilter(NOTIFICATION_DISCARD_ACTION+notifiId));
+        //registerReceiver(notificatinDiscardReceiver, new IntentFilter(NOTIFICATION_DISCARD_ACTION+notifiId));
+        notificationFilter.addAction(NOTIFICATION_DISCARD_ACTION+notifiId);
         notificationDiscardIntent.putExtra(NOTIFICATION_ARG_ID, notifiId);
         PendingIntent piDismiss = PendingIntent.getBroadcast(this, 0, notificationDiscardIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         //piDismiss.putExtra(NOTIFICATION_ARG_ID, notifiId);
