@@ -857,11 +857,8 @@ public class LocationUpdateService extends Service implements LocationListener {
         shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", notificationConfirmPI);
 
         int notifiId = getNotificationId();
-        Bundle bundle = new Bundle();
-        bundle.putString("Any String");
         Intent notificationDiscardIntent = new Intent(NOTIFICATION_DISCARD_ACTION);
         notificationDiscardIntent.putExtra(NOTIFICATION_ARG_ID, notifiId);
-        notificationDiscardIntent.putExtras(bundle);
         PendingIntent piDismiss = PendingIntent.getBroadcast(this, 0, notificationDiscardIntent, 0);
         //piDismiss.putExtra(NOTIFICATION_ARG_ID, notifiId);
         
