@@ -665,13 +665,14 @@ public class LocationUpdateService extends Service implements LocationListener {
         public void onReceive(Context context, Intent intent)
         {
             Log.i(TAG, "- DISCARDED CARD ACTION");
-            
-            try {
-                int notificationId = intent.getIntExtra(NOTIFICATION_ARG_ID, -1);
-                Log.i(TAG, "- NOTIFICATION CARD ID" + notificationId);
-            } catch (Throwable e) {
-                Log.w(TAG, "- Something bad happened while getting ID");
+            if (intent.hasExtra(NOTIFICATION_ARG_ID)){
+                Log.i(TAG, "- YES EXTRA");
+            }else{
+                Log.i(TAG, "- NO EXTRA");
             }
+            
+            int notificationId = intent.getIntExtra(NOTIFICATION_ARG_ID, -1);
+            Log.i(TAG, "- NOTIFICATION CARD ID: " + intent.getIntExtra(NOTIFICATION_ARG_ID, -1));
 
             //NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
             //setPace(false);
@@ -856,8 +857,11 @@ public class LocationUpdateService extends Service implements LocationListener {
         shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", notificationConfirmPI);
 
         int notifiId = getNotificationId();
+        Bundle bundle = new Bundle();
+        bundle.putString("Any String");
         Intent notificationDiscardIntent = new Intent(NOTIFICATION_DISCARD_ACTION);
         notificationDiscardIntent.putExtra(NOTIFICATION_ARG_ID, notifiId);
+        notificationDiscardIntent.putExtras(bundle);
         PendingIntent piDismiss = PendingIntent.getBroadcast(this, 0, notificationDiscardIntent, 0);
         //piDismiss.putExtra(NOTIFICATION_ARG_ID, notifiId);
         
