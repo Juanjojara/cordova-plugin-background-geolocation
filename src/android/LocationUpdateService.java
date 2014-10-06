@@ -674,8 +674,10 @@ public class LocationUpdateService extends Service implements LocationListener {
             int notificationId = intent.getIntExtra(NOTIFICATION_ARG_ID, -1);
             Log.i(TAG, "- NOTIFICATION CARD ID: " + intent.getIntExtra(NOTIFICATION_ARG_ID, -1));
 
-            //NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-            //setPace(false);
+            NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+            if (notificationId>=0){
+                mNotificationManager.cancel(notificationId);
+            }
         }
     };
     /**
