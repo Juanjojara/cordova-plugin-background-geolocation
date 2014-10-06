@@ -91,6 +91,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private long lastUpdateTime = 0l;
     
     private JSONObject params;
+    private JSONObject params_share;
     private JSONObject headers;
     private String url = "http://192.168.2.15:3000/users/current_location.json";
 
@@ -832,24 +833,34 @@ public class LocationUpdateService extends Service implements LocationListener {
     private boolean shareCard(com.tenforwardconsulting.cordova.bgloc.data.Card geoCard){
         try {
             Log.i(TAG, "SS 11");
-            params.remove("LocationSetting");
-            Log.i(TAG, "SS 22");
-            params.remove("SharingSetting");
-            params.remove("UserId");
+            //params.remove("LocationSetting");
+            //Log.i(TAG, "SS 22");
+            //params.remove("SharingSetting");
+            //params.remove("UserId");
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpPost request = new HttpPost(url);
             Log.i(TAG, "SS 33");
 
             //Proces for creating the card on the server
+            params_share = new JSONObject();
+            params_share.put("info", geoCard.getInfo());
+            params_share.put("lat", geoCard.getLatitude());
+            params_share.put("lon", geoCard.getLongitude());
+            params_share.put("location", geoCard.getLocation());
+            params_share.put("timestamp", geoCard.getCreated());
+            Log.i(TAG, "info: " + geoCard.getInfo() + " - location: " + geoCard.getLocation());
+
+            /*
             params.put("info", geoCard.getInfo());
             params.put("lat", geoCard.getLatitude());
             params.put("lon", geoCard.getLongitude());
             params.put("location", geoCard.getLocation());
             params.put("timestamp", geoCard.getCreated());
-
+            */
             Log.i(TAG, "SS 44");
 
-            StringEntity se = new StringEntity(params.toString());
+            StringEntity se = new StringEntity(params_share.toString());
+            //StringEntity se = new StringEntity(params.toString());
             request.setEntity(se);
             request.setHeader("Content-type", "application/json");
 
