@@ -667,7 +667,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             //boolean confirmed_card = true;
             Log.i(TAG, "- NOTIFICATION CARD ID: " + intent.getIntExtra(NOTIFICATION_ARG_CARD_ID, -1));
             if (notificationCardId > 0){
-                ShareTask task = new LocationUpdateService.ShareTask();
+                /*ShareTask task = new LocationUpdateService.ShareTask();
                 Log.d(TAG, "beforeexecute N Share" +  task.getStatus());
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
@@ -675,6 +675,9 @@ public class LocationUpdateService extends Service implements LocationListener {
                 else
                     task.execute(notificationCardId);
                 Log.d(TAG, "afterexecute N Share" +  task.getStatus());
+                */
+
+
                 //new ShareTask().execute(notificationCardId);
                 /*
                 CardDAO cdao = DAOFactory.createCardDAO(context);
@@ -1154,9 +1157,10 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
     }
 
-    private class ShareTask extends AsyncTask<Integer, Void, Boolean> {
+    /*private class ShareTask extends AsyncTask<Integer, Void, Boolean> {
+
         @Override
-        protected boolean doInBackground(int... confirmCardId) {
+        protected Boolean doInBackground(int...confirmCardId) {
             boolean confirmed_card = true;
             //CardDAO cdao = DAOFactory.createCardDAO(context);
             CardDAO cdao = DAOFactory.createCardDAO(LocationUpdateService.this.getApplicationContext());
@@ -1191,8 +1195,8 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
 
         @Override
-        protected void onPostExecute(boolean result) {
+        protected void onPostExecute(Boolean result) {
             Log.d(TAG, "PostCardTask#onPostExecture");
         }
-    }
+    }*/
 }
