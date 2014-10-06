@@ -53,6 +53,28 @@ public class SQLiteCardDAO implements CardDAO {
 		return all.toArray(new Card[all.size()]);
 	}
 
+	public Card getCardById(String tableName, int cardId) {
+		SQLiteDatabase db = null;
+		Cursor c = null;
+		Card resCard = null;
+		SharedPreferences pref = context.getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);
+		try {
+			db = new CardOpenHelper(context).getReadableDatabase();
+			c = db.query(tableName, new String[]{"id", "created", "info", "location", "latitude", "longitude", "sharing_level", "location_level", "user_id", "confirm"}, "id = ?", new String[]{Integer.toString(cardId)}, null, null, "id");
+			while (c.moveToNext()) {
+				resCard = hydrate(c);
+			}
+		} finally {
+			if (c != null) {
+				c.close();
+			}
+			if (db != null) {
+				db.close();
+			}
+		}
+		return resCard;
+	}
+
 	public void geoCards() {
 		//SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 		SharedPreferences pref = context.getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);

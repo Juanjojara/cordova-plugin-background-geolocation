@@ -90,7 +90,6 @@ public class Card {
 	
 	public static Card createCard(android.location.Location originalLocation, Context context, String userId, int cardId) {
 		Card card = new Card();
-		//SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 		SharedPreferences pref = context.getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);
 		card.setId(cardId);
 		card.setCreated(new Date().getTime());

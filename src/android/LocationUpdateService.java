@@ -77,6 +77,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private static final String NOTIFICATION_CONFIRM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.NOTIFICATION_CONFIRM_ACTION";
     private static final String NOTIFICATION_DISCARD_ACTION         = "com.tenforwardconsulting.cordova.bgloc.NOTIFICATION_DISCARD_ACTION";
     private static final String NOTIFICATION_ARG_ID =           "NOTIF_ID";
+    private static final String NOTIFICATION_ARG_CARD_ID =           "CARD_ID";
     private static final long STATIONARY_TIMEOUT                                = 5 * 1000 * 60;    // 5 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_LAZY         = 3 * 1000 * 60;    // 3 minutes.  
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE   = 1 * 1000 * 60;    // 1 minute.
@@ -654,7 +655,45 @@ public class LocationUpdateService extends Service implements LocationListener {
         public void onReceive(Context context, Intent intent)
         {
             Log.i(TAG, "- CONFIRMED CARD ACTION");
-            //setPace(false);
+            if (intent.hasExtra(NOTIFICATION_ARG_CARD_ID)){
+                Log.i(TAG, "- YES CARD EXTRA");
+            }else{
+                Log.i(TAG, "- NO CARD EXTRA");
+            }
+            
+            int notificationId = intent.getIntExtra(NOTIFICATION_ARG_ID, -1);
+            int notificationCardId = intent.getIntExtra(NOTIFICATION_ARG_CARD_ID, -1);
+            boolean confirmed_card = true;
+            Log.i(TAG, "- NOTIFICATION CARD ID: " + intent.getIntExtra(NOTIFICATION_ARG_CARD_ID, -1));
+            if (notificationCardId > 0){
+                CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
+                Card confirmCard = cdao.getCardById("pending_confirm", notificationCardId);
+                if (confirmCard != null){
+                    Log.i(TAG, "Confirm Sharing");
+                    if (shareCard(confirmCard)){
+                        if (cdao.persistCard("shared_cards", confirmCard)) {
+                            Log.d(TAG, "Persisted Card in shared_cards: " + confirmCard);
+                        } else {
+                            Log.w(TAG, "CARD SHARED! but failed to persist card in shared_cards table");
+                        }
+                    }
+                    else{
+                        if (cdao.persistCard("pending_internet", confirmCard)) {
+                            Log.d(TAG, "Persisted Card in pending_internet: " + confirmCard);
+                        } else {
+                            Log.w(TAG, "Failed to persist card in pending_internet table");
+                            confirmed_card = false;
+                        }
+                    }
+                    if (confirmed_card){
+                        cdao.deleteCard("pending_confirm", confirmCard);
+                        NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+                        if (notificationId >= 0){
+                            mNotificationManager.cancel(notificationId);
+                        }
+                    }
+                }
+            }
         }
     };
     /**
@@ -663,22 +702,11 @@ public class LocationUpdateService extends Service implements LocationListener {
     private BroadcastReceiver notificatinDiscardReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent)
-        {
-            Log.i(TAG, "- DISCARDED CARD ACTION");
-            if (intent.hasExtra(NOTIFICATION_ARG_ID)){
-                Log.i(TAG, "- YES EXTRA");
-            }else{
-                Log.i(TAG, "- NO EXTRA");
-            }
-            
+        {            
             int notificationId = intent.getIntExtra(NOTIFICATION_ARG_ID, -1);
-            Log.i(TAG, "- NOTIFICATION CARD ID: " + intent.getIntExtra(NOTIFICATION_ARG_ID, -1));
-
             NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
             if (notificationId>=0){
                 mNotificationManager.cancel(notificationId);
-                //mNotificationManager.cancelAll();
-                Log.i(TAG, "- DISCARDED NOTIFICATION");
             }
         }
     };
@@ -734,7 +762,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                 String curAdd = getAddress(Double.parseDouble(geoCard.getLatitude()), Double.parseDouble(geoCard.getLongitude()), geoCard.getLocation_level());
                 if (curAdd == null){
                     if (isNetworkConnected()){
-                        postNotification("Error", "Please reset your device and start the application again");
+                        postNotification("Error", "Please reset your device and start the application again", -1);
                     }
                     return false;                    
                 }
@@ -748,7 +776,7 @@ public class LocationUpdateService extends Service implements LocationListener {
 
                 /*if (curAdd.equals(lastAdd) && curInfo.equals(lastInfo)){
                     Log.i(TAG, "repeated card");
-                    //postNotification(curInfo, curAdd + " (Not shared)");
+                    //postNotification(curInfo, curAdd + " (Not shared)", -1);
                     return true;
                 }else{*/
                     Log.i(TAG, "new card");
@@ -766,7 +794,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                     if (cdao.persistCard("pending_confirm", geoCard)) {
                         Log.i(TAG, "Confirm Sharing");
                         //SEND NOTIFICATION
-                        postNotification(curInfo, curAdd);
+                        postNotification(curInfo, curAdd, geoCard.getId());
                         Log.d(TAG, "Persisted Card in pending_confirm: " + geoCard);
                         return true;
                     } else {
@@ -843,12 +871,10 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
     }
 
-    private void postNotification(String info, String loc){
+    private void postNotification(String info, String loc, int cardId){
         //Intent notificationServiceIntent;
         //notificationServiceIntent = new Intent(this, LifeshareNotificationService.class);
         //PendingIntent pintent = PendingIntent.getService(mContext, 0, notificationServiceIntent, 0);
-        //Intent dismissIntent = new Intent("discard");
-        //PendingIntent piDismiss = PendingIntent.getService(this, 0, dismissIntent, 0);
 
         //Intent snoozeIntent = new Intent("confirm");
         //PendingIntent piSnooze = PendingIntent.getService(this, 0, snoozeIntent, 0);
@@ -858,16 +884,33 @@ public class LocationUpdateService extends Service implements LocationListener {
         shareLocBuilder.setContentText(info + " " + loc);
         shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
 
-        shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", notificationConfirmPI);
-
         int notifiId = getNotificationId();
+
+        //Construct the Confirm Action button for the notification
+        //We need to create a specific intent or else the putExtra data will be overwritten be the new notification
+        Intent notificationConfirmIntent = new Intent(NOTIFICATION_CONFIRM_ACTION+notifiId);
+        //We need to notify the broadcast listener to listen for the new created intent
+        registerReceiver(notificatinConfirmReceiver, new IntentFilter(NOTIFICATION_CONFIRM_ACTION+notifiId));
+        //For the discard action we only need the notification id
+        notificationConfirmIntent.putExtra(NOTIFICATION_ARG_ID, notifiId);
+        notificationConfirmIntent.putExtra(NOTIFICATION_ARG_CARD_ID, cardId);
+        //We create the Pending intent using the created intent. FLAG_UPDATE_CURRENT is needed or else the putExtra does not "put" the data
+        PendingIntent piConfirm = PendingIntent.getBroadcast(this, 0, notificationConfirmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //We add the created intent to the notification
+        shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", piConfirm);
+
+        //Construct the Discard Action button for the notification
+        //We need to create a specific intent or else the putExtra data will be overwritten be the new notification
         Intent notificationDiscardIntent = new Intent(NOTIFICATION_DISCARD_ACTION+notifiId);
+        //We need to notify the broadcast listener to listen for the new created intent
         registerReceiver(notificatinDiscardReceiver, new IntentFilter(NOTIFICATION_DISCARD_ACTION+notifiId));
+        //For the discard action we only need the notification id
         notificationDiscardIntent.putExtra(NOTIFICATION_ARG_ID, notifiId);
-        PendingIntent piDismiss = PendingIntent.getBroadcast(this, 0, notificationDiscardIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        
-        shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", piDismiss);
-        //shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", notificationDiscardPI);
+        //We create the Pending intent using the created intent. FLAG_UPDATE_CURRENT is needed or else the putExtra does not "put" the data
+        PendingIntent piDiscard = PendingIntent.getBroadcast(this, 0, notificationDiscardIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //We add the created intent to the notification
+        shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", piDiscard);
+
         Notification shareNotification;
         if (android.os.Build.VERSION.SDK_INT >= 16) {
             shareNotification = buildForegroundNotification(shareLocBuilder);
