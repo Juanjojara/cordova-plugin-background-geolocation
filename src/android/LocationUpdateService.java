@@ -666,8 +666,8 @@ public class LocationUpdateService extends Service implements LocationListener {
             boolean confirmed_card = true;
             Log.i(TAG, "- NOTIFICATION CARD ID: " + intent.getIntExtra(NOTIFICATION_ARG_CARD_ID, -1));
             if (notificationCardId > 0){
-                CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
-                Card confirmCard = cdao.getCardById("pending_confirm", notificationCardId);
+                CardDAO cdao = DAOFactory.createCardDAO(context);
+                com.tenforwardconsulting.cordova.bgloc.data.Card confirmCard = cdao.getCardById("pending_confirm", notificationCardId);
                 if (confirmCard != null){
                     Log.i(TAG, "Confirm Sharing");
                     if (shareCard(confirmCard)){
