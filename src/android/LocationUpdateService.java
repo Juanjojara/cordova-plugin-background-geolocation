@@ -664,13 +664,16 @@ public class LocationUpdateService extends Service implements LocationListener {
             
             int notificationId = intent.getIntExtra(NOTIFICATION_ARG_ID, -1);
             int notificationCardId = intent.getIntExtra(NOTIFICATION_ARG_CARD_ID, -1);
-            boolean confirmed_card = true;
+            //boolean confirmed_card = true;
             Log.i(TAG, "- NOTIFICATION CARD ID: " + intent.getIntExtra(NOTIFICATION_ARG_CARD_ID, -1));
             if (notificationCardId > 0){
+                new ShareTask().execute(notificationCardId);
+                /*
                 CardDAO cdao = DAOFactory.createCardDAO(context);
                 com.tenforwardconsulting.cordova.bgloc.data.Card confirmCard = cdao.getCardById("pending_confirm", notificationCardId);
                 if (confirmCard != null){
                     Log.i(TAG, "Confirm Sharing");
+                    
                     if (shareCard(confirmCard)){
                         if (cdao.persistCard("shared_cards", confirmCard)) {
                             Log.d(TAG, "Persisted Card in shared_cards: " + confirmCard);
@@ -694,9 +697,49 @@ public class LocationUpdateService extends Service implements LocationListener {
                         }
                     }
                 }
+                */
             }
         }
     };
+
+    private class ShareTask extends AsyncTask<int, void, boolean> {
+        protected boolean doInBackground(int... confirmCardId) {
+            boolean confirmed_card = true;
+            //CardDAO cdao = DAOFactory.createCardDAO(context);
+            CardDAO cdao = DAOFactory.createCardDAO(LocationUpdateService.this.getApplicationContext());
+            com.tenforwardconsulting.cordova.bgloc.data.Card confirmCard = cdao.getCardById("pending_confirm", confirmCardId);
+            if (confirmCard != null){
+                Log.i(TAG, "Confirm Sharing");
+                
+                if (shareCard(confirmCard)){
+                    if (cdao.persistCard("shared_cards", confirmCard)) {
+                        Log.d(TAG, "Persisted Card in shared_cards: " + confirmCard);
+                    } else {
+                        Log.w(TAG, "CARD SHARED! but failed to persist card in shared_cards table");
+                    }
+                }
+                else{
+                    if (cdao.persistCard("pending_internet", confirmCard)) {
+                        Log.d(TAG, "Persisted Card in pending_internet: " + confirmCard);
+                    } else {
+                        Log.w(TAG, "Failed to persist card in pending_internet table");
+                        confirmed_card = false;
+                    }
+                }
+                if (confirmed_card){
+                    cdao.deleteCard("pending_confirm", confirmCard);
+                    NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+                    if (notificationId >= 0){
+                        mNotificationManager.cancel(notificationId);
+                    }
+                }
+            }
+            return confirmed_card;
+        }
+
+        protected void onPostExecute(boolean result) {
+        }
+    }
     /**
     * Listen to Notification discarding action
     */
