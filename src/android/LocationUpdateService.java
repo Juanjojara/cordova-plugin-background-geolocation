@@ -1157,6 +1157,28 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
     }
 
+    private class ShareCardTask extends AsyncTask<Object, Integer, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Object...objects) {
+            Log.d(TAG, "Executing PostLocationTask#doInBackground");
+            Log.i(TAG, "1111 Post saved card");
+            CardDAO cardDAO = DAOFactory.createCardDAO(LocationUpdateService.this.getApplicationContext());
+            for (com.tenforwardconsulting.cordova.bgloc.data.Card savedGeoCard : cardDAO.geoPendingCards()) {
+                Log.d(TAG, "Posting saved card");
+                if (postCard(savedGeoCard)) {
+                    cardDAO.deleteCard("pending_geo", savedGeoCard);
+                }
+            }
+            Log.i(TAG, "9999 Post saved card");
+            return true;
+        }
+        @Override
+        protected void onPostExecute(Boolean result) {
+            Log.d(TAG, "PostLocationTask#onPostExecture");
+        }
+    }
+
     /*private class ShareTask extends AsyncTask<Integer, Void, Boolean> {
 
         @Override
