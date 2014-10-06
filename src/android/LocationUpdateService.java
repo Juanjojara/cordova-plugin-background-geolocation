@@ -1167,6 +1167,35 @@ public class LocationUpdateService extends Service implements LocationListener {
             int notificationCardId = ids[1];
             Boolean confirmed_card = true;
 
+            CardDAO cdao = DAOFactory.createCardDAO(LocationUpdateService.this.getApplicationContext());
+            com.tenforwardconsulting.cordova.bgloc.data.Card confirmCard = cdao.getCardById("pending_confirm", notificationCardId);
+            if (confirmCard != null){
+                Log.i(TAG, "Confirm Sharing");
+                
+                if (shareCard(confirmCard)){
+                    if (cdao.persistCard("shared_cards", confirmCard)) {
+                        Log.d(TAG, "Persisted Card in shared_cards: " + confirmCard);
+                    } else {
+                        Log.w(TAG, "CARD SHARED! but failed to persist card in shared_cards table");
+                    }
+                }
+                else{
+                    if (cdao.persistCard("pending_internet", confirmCard)) {
+                        Log.d(TAG, "Persisted Card in pending_internet: " + confirmCard);
+                    } else {
+                        Log.w(TAG, "Failed to persist card in pending_internet table");
+                        confirmed_card = false;
+                    }
+                }
+                if (confirmed_card){
+                    cdao.deleteCard("pending_confirm", confirmCard);
+                    NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+                    if (notificationId >= 0){
+                        mNotificationManager.cancel(notificationId);
+                    }
+                }
+            }
+
             Log.i(TAG, "9999 Post shared card");
             return true;
         }
