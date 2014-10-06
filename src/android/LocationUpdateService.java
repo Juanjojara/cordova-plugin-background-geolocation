@@ -831,11 +831,14 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     private boolean shareCard(com.tenforwardconsulting.cordova.bgloc.data.Card geoCard){
         try {
+            Log.i(TAG, "SS 11");
             params.remove("LocationSetting");
+            Log.i(TAG, "SS 22");
             params.remove("SharingSetting");
             params.remove("UserId");
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpPost request = new HttpPost(url);
+            Log.i(TAG, "SS 33");
 
             //Proces for creating the card on the server
             params.put("info", geoCard.getInfo());
@@ -843,6 +846,8 @@ public class LocationUpdateService extends Service implements LocationListener {
             params.put("lon", geoCard.getLongitude());
             params.put("location", geoCard.getLocation());
             params.put("timestamp", geoCard.getCreated());
+
+            Log.i(TAG, "SS 44");
 
             StringEntity se = new StringEntity(params.toString());
             request.setEntity(se);
@@ -856,6 +861,9 @@ public class LocationUpdateService extends Service implements LocationListener {
                     request.setHeader(headkey, (String)headers.getString(headkey));
                 }
             }
+
+            Log.i(TAG, "SS 55");
+
             Log.d(TAG, "Posting to " + request.getURI().toString());
             HttpResponse response = httpClient.execute(request);
             Log.i(TAG, "Response received: " + response.getStatusLine());
