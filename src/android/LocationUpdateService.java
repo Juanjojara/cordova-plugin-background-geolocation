@@ -676,8 +676,8 @@ public class LocationUpdateService extends Service implements LocationListener {
 
             NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
             if (notificationId>=0){
-                //mNotificationManager.cancel(notificationId);
-                mNotificationManager.cancelAll();
+                mNotificationManager.cancel(notificationId);
+                //mNotificationManager.cancelAll();
                 Log.i(TAG, "- DISCARDED NOTIFICATION");
             }
         }
