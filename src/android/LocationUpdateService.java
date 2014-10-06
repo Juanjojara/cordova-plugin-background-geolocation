@@ -667,15 +667,14 @@ public class LocationUpdateService extends Service implements LocationListener {
             //boolean confirmed_card = true;
             Log.i(TAG, "- NOTIFICATION CARD ID: " + intent.getIntExtra(NOTIFICATION_ARG_CARD_ID, -1));
             if (notificationCardId > 0){
-                /*ShareTask task = new LocationUpdateService.ShareTask();
+                ShareCardTask task = new LocationUpdateService.ShareCardTask();
                 Log.d(TAG, "beforeexecute N Share" +  task.getStatus());
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-                    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, notificationCardId);
+                    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, notificationId, notificationCardId);
                 else
-                    task.execute(notificationCardId);
+                    task.execute(notificationId, notificationCardId);
                 Log.d(TAG, "afterexecute N Share" +  task.getStatus());
-                */
 
 
                 //new ShareTask().execute(notificationCardId);
