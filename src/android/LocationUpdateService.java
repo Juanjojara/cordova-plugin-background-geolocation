@@ -875,7 +875,8 @@ public class LocationUpdateService extends Service implements LocationListener {
             shareNotification = buildForegroundNotificationCompat(shareLocBuilder);
         }
         //shareNotification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
-        shareNotification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE;
+        //shareNotification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE;
+        shareNotification.flags |= Notification.FLAG_ONGOING_EVENT;
 
         NotificationManager mNotificationManager = (NotificationManager)
                 getSystemService(NOTIFICATION_SERVICE);
