@@ -984,6 +984,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private String getAddress(double lat, double lng, String location_setting) {
+        //We create a string location by reverse geoCoding the latitude and longitude values 
         Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
         String revCity = null;
         String revRegion =  null;
@@ -1012,6 +1013,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private String prepareLocation(String curCity, String curRegion, String curCountry, String userloc_setting){
+        //Create a unique string location accoriding to the location data and the location detail settings 
         int loc_level = location_level(userloc_setting);
         String curLocation = "unavailable. City: " + curCity + ". Reg: " + curRegion + ". Coun: " + curCountry + ". Sets: " + loc_level;
         if ((curCity != null) && (location_level(userloc_setting) <= 0)){
@@ -1034,6 +1036,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     };
 
     private int location_level(String loc_level){
+        //Converts a location level representation to a number for better comparison
         int ret_level = 3;
         if (loc_level.equals("city"))
             ret_level = 0;
@@ -1046,11 +1049,9 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private void persistLocation(Location location) {
-        //LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
+        //Function that creates a card from a location (latitude, longitude)
         CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
-        //com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
         //Store settings variables passed during the initial configuration of the service
-        //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
         SharedPreferences pref = this.getApplicationContext().getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);
         SharedPreferences.Editor edit = pref.edit();
         String user_id = "";
@@ -1072,11 +1073,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         //Create the partial card for this location
         int cardId = cdao.getCardId();
         com.tenforwardconsulting.cordova.bgloc.data.Card savedCard = com.tenforwardconsulting.cordova.bgloc.data.Card.createCard(location, mContext, user_id, cardId);
-        /*if (dao.persistLocation(savedLocation)) {
-            Log.d(TAG, "Persisted Location: " + savedLocation);
-        } else {
-            Log.w(TAG, "Failed to persist location");
-        }*/
+        //Store the partial card in the db for processing it later in a Async task
         if (cdao.persistCard("pending_geo", savedCard)) {
             Log.d(TAG, "Persisted Card in pending_geo: " + savedCard);
         } else {
@@ -1085,6 +1082,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private boolean isNetworkConnected() {
+        //Returns TRUE if there is access to the Internet
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo != null) {
             Log.d(TAG, "Network found, type = " + networkInfo.getTypeName());
@@ -1102,6 +1100,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         super.onDestroy();
     }
     private void cleanUp() {
+        //Before stopping the service we stop processes, do some cleaning work
         locationManager.removeUpdates(this);
         alarmManager.cancel(stationaryAlarmPI);
         alarmManager.cancel(stationaryLocationPollingPI);
@@ -1135,19 +1134,19 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private class PostLocationTask extends AsyncTask<Object, Integer, Boolean> {
-
+        //Async task for processing all created cards
         @Override
         protected Boolean doInBackground(Object...objects) {
             Log.d(TAG, "Executing PostLocationTask#doInBackground");
-            Log.i(TAG, "1111 Post saved card");
+            //Get all the processing pending cards from the DB
             CardDAO cardDAO = DAOFactory.createCardDAO(LocationUpdateService.this.getApplicationContext());
             for (com.tenforwardconsulting.cordova.bgloc.data.Card savedGeoCard : cardDAO.geoPendingCards()) {
                 Log.d(TAG, "Posting saved card");
+                //If we can successfully process the card, we delete it from the pending table
                 if (postCard(savedGeoCard)) {
                     cardDAO.deleteCard("pending_geo", savedGeoCard);
                 }
             }
-            Log.i(TAG, "9999 Post saved card");
             return true;
         }
         @Override
@@ -1157,21 +1156,24 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private class ShareCardTask extends AsyncTask<Integer, Integer, Boolean> {
-
+        //A networking task needs to be executed by an async thread, so we created this function
+        //that shares a card that is confirmed from the notification area
         @Override
         protected Boolean doInBackground(Integer...ids) {
-            Log.d(TAG, "Executing PostLocationTask#doInBackground");
-            Log.i(TAG, "1111 Post shared card");
-            int notificationId = ids[0];
-            int notificationCardId = ids[1];
-            Boolean confirmed_card = true;
+            Log.d(TAG, "Executing ShareCardTask#doInBackground");
+            int notificationId = ids[0];                    //The notification ID so we can remove it after processing it
+            int notificationCardId = ids[1];                //The card ID so we can get the card from the DB and share it
+            Boolean confirmed_card = true;                  //Flag that indicates if the card was succesfully shared or stored for automatic sharing
 
+            //Get the card from the DB
             CardDAO cdao = DAOFactory.createCardDAO(LocationUpdateService.this.getApplicationContext());
             com.tenforwardconsulting.cordova.bgloc.data.Card confirmCard = cdao.getCardById("pending_confirm", notificationCardId);
             if (confirmCard != null){
                 Log.i(TAG, "Confirm Sharing");
-                
+                //Share the card
                 if (shareCard(confirmCard)){
+                    //Store the shared card in the SHARED table
+                    //This step could be removed in the future if we don't find a use for the already shared cards
                     if (cdao.persistCard("shared_cards", confirmCard)) {
                         Log.d(TAG, "Persisted Card in shared_cards: " + confirmCard);
                     } else {
@@ -1179,6 +1181,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                     }
                 }
                 else{
+                    //If we could not shared the card now, we store it in the DB for automatic sharing later
                     if (cdao.persistCard("pending_internet", confirmCard)) {
                         Log.d(TAG, "Persisted Card in pending_internet: " + confirmCard);
                     } else {
@@ -1186,6 +1189,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                         confirmed_card = false;
                     }
                 }
+                //If  we successfully process the notification, we delete it and also the card from the pending confirmation table
                 if (confirmed_card){
                     cdao.deleteCard("pending_confirm", confirmCard);
                     NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
@@ -1194,56 +1198,11 @@ public class LocationUpdateService extends Service implements LocationListener {
                     }
                 }
             }
-
-            Log.i(TAG, "9999 Post shared card");
             return true;
         }
         @Override
         protected void onPostExecute(Boolean result) {
-            Log.d(TAG, "PostLocationTask#onPostExecture");
+            Log.d(TAG, "ShareCardTask#onPostExecture");
         }
     }
-
-    /*private class ShareTask extends AsyncTask<Integer, Void, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(int...confirmCardId) {
-            boolean confirmed_card = true;
-            //CardDAO cdao = DAOFactory.createCardDAO(context);
-            CardDAO cdao = DAOFactory.createCardDAO(LocationUpdateService.this.getApplicationContext());
-            com.tenforwardconsulting.cordova.bgloc.data.Card confirmCard = cdao.getCardById("pending_confirm", confirmCardId);
-            if (confirmCard != null){
-                Log.i(TAG, "Confirm Sharing");
-                
-                if (shareCard(confirmCard)){
-                    if (cdao.persistCard("shared_cards", confirmCard)) {
-                        Log.d(TAG, "Persisted Card in shared_cards: " + confirmCard);
-                    } else {
-                        Log.w(TAG, "CARD SHARED! but failed to persist card in shared_cards table");
-                    }
-                }
-                else{
-                    if (cdao.persistCard("pending_internet", confirmCard)) {
-                        Log.d(TAG, "Persisted Card in pending_internet: " + confirmCard);
-                    } else {
-                        Log.w(TAG, "Failed to persist card in pending_internet table");
-                        confirmed_card = false;
-                    }
-                }
-                if (confirmed_card){
-                    cdao.deleteCard("pending_confirm", confirmCard);
-                    //NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-                    //if (notificationId >= 0){
-                    //    mNotificationManager.cancel(notificationId);
-                    //}
-                }
-            }
-            return confirmed_card;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            Log.d(TAG, "PostCardTask#onPostExecture");
-        }
-    }*/
 }
