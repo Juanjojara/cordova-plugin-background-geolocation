@@ -75,6 +75,29 @@ public class SQLiteCardDAO implements CardDAO {
 		return all.toArray(new Card[all.size()]);
 	}
 
+	public Card[] getCardsByTable(String tableName){
+		SQLiteDatabase db = null;
+		Cursor c = null;
+		List<Card> all = new ArrayList<Card>();
+		SharedPreferences pref = context.getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);
+		String user_id = pref.getString("user_id", "");
+		try {
+			db = new CardOpenHelper(context).getReadableDatabase();
+			c = db.query(tableName, new String[]{"id", "created", "info", "location", "latitude", "longitude", "sharing_level", "location_level", "user_id", "confirm"}, "user_id = ?", new String[]{user_id}, null, null, "id");
+			while (c.moveToNext()) {
+				all.add(hydrate(c));
+			}
+		} finally {
+			if (c != null) {
+				c.close();
+			}
+			if (db != null) {
+				db.close();
+			}
+		}
+		return all.toArray(new Card[all.size()]);	
+	}
+
 	public Card getCardById(String tableName, int cardId) {
 		SQLiteDatabase db = null;
 		Cursor c = null;

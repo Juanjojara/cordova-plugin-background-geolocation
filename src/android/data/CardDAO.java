@@ -3,6 +3,7 @@ package com.tenforwardconsulting.cordova.bgloc.data;
 public interface CardDAO {
 	public Card[] geoPendingCards();
 	public Card[] internetPendingCards();
+	public Card[] getCardsByTable(String tableName);
 	public Card getCardById(String tableName, int cardId);
 	public void geoCards();
 	public int getCardId();

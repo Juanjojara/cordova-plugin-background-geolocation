@@ -752,7 +752,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                 String curAdd = getAddress(Double.parseDouble(geoCard.getLatitude()), Double.parseDouble(geoCard.getLongitude()), geoCard.getLocation_level());
                 if (curAdd == null){
                     if (isNetworkConnected()){
-                        postNotification("Error", "Please reset your device and start the application again", -1);
+                        postNotification("Error", "Please restart the application. If the problem persists maybe yuo need to restart also the device", -1);
                     }
                     return false;                    
                 }
@@ -1119,6 +1119,11 @@ public class LocationUpdateService extends Service implements LocationListener {
                     cardDAO.deleteCard("pending_internet", savedInternetCard);
                 }
             }
+            //Get all the pending confirm cards from the DB and resend the notification
+            for (com.tenforwardconsulting.cordova.bgloc.data.Card savedConfirmCard : cardDAO.getCardsByTable("pending_confirm")) {
+                Log.d(TAG, "Sending pending confirm cards notifications");
+                postNotification(savedConfirmCard.getInfo(), savedConfirmCard.getLocation(), savedConfirmCard.getId());
+            }
             return true;
         }
         @Override
@@ -1132,14 +1137,12 @@ public class LocationUpdateService extends Service implements LocationListener {
         //that shares a card that is confirmed from the notification area
         @Override
         protected Boolean doInBackground(Integer...ids) {
-            Log.d(TAG, "Async AAAAAAAAAAAAA");
             Log.d(TAG, "Executing ShareCardTask#doInBackground");
             int notificationId = ids[0];                    //The notification ID so we can remove it after processing it
             int notificationCardId = ids[1];                //The card ID so we can get the card from the DB and share it
             Boolean confirmed_card = true;                  //Flag that indicates if the card was succesfully shared or stored for automatic sharing
 
             //Get the card from the DB
-            Log.d(TAG, "Async BBBBBBBBBBBBB");
             CardDAO cdao = DAOFactory.createCardDAO(LocationUpdateService.this.getApplicationContext());
             com.tenforwardconsulting.cordova.bgloc.data.Card confirmCard = cdao.getCardById("pending_confirm", notificationCardId);
             if (confirmCard != null){
