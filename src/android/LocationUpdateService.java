@@ -1122,18 +1122,22 @@ public class LocationUpdateService extends Service implements LocationListener {
         //that shares a card that is confirmed from the notification area
         @Override
         protected Boolean doInBackground(Integer...ids) {
+            Log.d(TAG, "Async AAAAAAAAAAAAA");
             Log.d(TAG, "Executing ShareCardTask#doInBackground");
             int notificationId = ids[0];                    //The notification ID so we can remove it after processing it
             int notificationCardId = ids[1];                //The card ID so we can get the card from the DB and share it
             Boolean confirmed_card = true;                  //Flag that indicates if the card was succesfully shared or stored for automatic sharing
 
             //Get the card from the DB
+            Log.d(TAG, "Async BBBBBBBBBBBBB");
             CardDAO cdao = DAOFactory.createCardDAO(LocationUpdateService.this.getApplicationContext());
             com.tenforwardconsulting.cordova.bgloc.data.Card confirmCard = cdao.getCardById("pending_confirm", notificationCardId);
             if (confirmCard != null){
+                Log.d(TAG, "Async CCCCCCCCCCCCC");
                 Log.i(TAG, "Confirm Sharing");
                 //Share the card
                 if (shareCard(confirmCard)){
+                    Log.d(TAG, "Async DDDDDDDDDDDDDDD");
                     //Store the shared card in the SHARED table
                     //This step could be removed in the future if we don't find a use for the already shared cards
                     if (cdao.persistCard("shared_cards", confirmCard)) {
@@ -1143,6 +1147,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                     }
                 }
                 else{
+                    Log.d(TAG, "Async EEEEEEEEEEEEEEE");
                     //If we could not shared the card now, we store it in the DB for automatic sharing later
                     if (cdao.persistCard("pending_internet", confirmCard)) {
                         Log.d(TAG, "Persisted Card in pending_internet: " + confirmCard);
@@ -1153,9 +1158,11 @@ public class LocationUpdateService extends Service implements LocationListener {
                 }
                 //If  we successfully process the notification, we delete it and also the card from the pending confirmation table
                 if (confirmed_card){
+                    Log.d(TAG, "Async FFFFFFFFFFFFFFFFF");
                     cdao.deleteCard("pending_confirm", confirmCard);
                     NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
                     if (notificationId >= 0){
+                        Log.d(TAG, "Async GGGGGGGGGGGGGGGGGG");
                         mNotificationManager.cancel(notificationId);
                     }
                 }
