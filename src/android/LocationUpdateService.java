@@ -675,39 +675,6 @@ public class LocationUpdateService extends Service implements LocationListener {
                 else
                     task.execute(notificationId, notificationCardId);
                 Log.d(TAG, "afterexecute N Share" +  task.getStatus());
-
-
-                //new ShareTask().execute(notificationCardId);
-                /*
-                CardDAO cdao = DAOFactory.createCardDAO(context);
-                com.tenforwardconsulting.cordova.bgloc.data.Card confirmCard = cdao.getCardById("pending_confirm", notificationCardId);
-                if (confirmCard != null){
-                    Log.i(TAG, "Confirm Sharing");
-                    
-                    if (shareCard(confirmCard)){
-                        if (cdao.persistCard("shared_cards", confirmCard)) {
-                            Log.d(TAG, "Persisted Card in shared_cards: " + confirmCard);
-                        } else {
-                            Log.w(TAG, "CARD SHARED! but failed to persist card in shared_cards table");
-                        }
-                    }
-                    else{
-                        if (cdao.persistCard("pending_internet", confirmCard)) {
-                            Log.d(TAG, "Persisted Card in pending_internet: " + confirmCard);
-                        } else {
-                            Log.w(TAG, "Failed to persist card in pending_internet table");
-                            confirmed_card = false;
-                        }
-                    }
-                    if (confirmed_card){
-                        cdao.deleteCard("pending_confirm", confirmCard);
-                        NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-                        if (notificationId >= 0){
-                            mNotificationManager.cancel(notificationId);
-                        }
-                    }
-                }
-                */
             }
         }
     };
@@ -1125,6 +1092,21 @@ public class LocationUpdateService extends Service implements LocationListener {
                 //If we can successfully process the card, we delete it from the pending table
                 if (postCard(savedGeoCard)) {
                     cardDAO.deleteCard("pending_geo", savedGeoCard);
+                }
+            }
+            //Get all the internet pending cards from the DB
+            for (com.tenforwardconsulting.cordova.bgloc.data.Card savedInternetCard : cardDAO.internetPendingCards()) {
+                Log.d(TAG, "Sharing internet pending card");
+                //If we can successfully share the card, we delete it from the internet pending table
+                if (shareCard(savedInternetCard)){
+                    //Store the shared card in the SHARED table
+                    //This step could be removed in the future if we don't find a use for the already shared cards
+                    if (cdao.persistCard("shared_cards", savedInternetCard)) {
+                        Log.d(TAG, "Persisted Card in shared_cards: " + savedInternetCard);
+                    } else {
+                        Log.w(TAG, "CARD SHARED! but failed to persist card in shared_cards table");
+                    }
+                    cardDAO.deleteCard("pending_internet", savedInternetCard);
                 }
             }
             return true;
