@@ -765,7 +765,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             return false;
         }else{
             try {
-                Log.i(TAG, "Posting  native card: " + geoCard);
+                Log.i(TAG, "Posting native card: " + geoCard);
                 
                 //Get user settings for creating and sharing a card
                 SharedPreferences pref = mContext.getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);
@@ -781,7 +781,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                     }
                     return false;                    
                 }
-                String curInfo = getInfo();
+                String curInfo = getInfo(geoCard.getCreated());
 
                 //Control to avoid creating redundant cards
                 SharedPreferences.Editor edit = pref.edit();
@@ -846,14 +846,8 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     private boolean shareCard(com.tenforwardconsulting.cordova.bgloc.data.Card geoCard){
         try {
-            Log.i(TAG, "SS 11");
-            //params.remove("LocationSetting");
-            //Log.i(TAG, "SS 22");
-            //params.remove("SharingSetting");
-            //params.remove("UserId");
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpPost request = new HttpPost(url);
-            Log.i(TAG, "SS 33");
 
             //Proces for creating the card on the server
             params_share = new JSONObject();
@@ -863,15 +857,6 @@ public class LocationUpdateService extends Service implements LocationListener {
             params_share.put("location", geoCard.getLocation());
             params_share.put("timestamp", geoCard.getCreated());
             Log.i(TAG, "info: " + geoCard.getInfo() + " - location: " + geoCard.getLocation());
-
-            /*
-            params.put("info", geoCard.getInfo());
-            params.put("lat", geoCard.getLatitude());
-            params.put("lon", geoCard.getLongitude());
-            params.put("location", geoCard.getLocation());
-            params.put("timestamp", geoCard.getCreated());
-            */
-            Log.i(TAG, "SS 44");
 
             StringEntity se = new StringEntity(params_share.toString());
             //StringEntity se = new StringEntity(params.toString());
@@ -886,8 +871,6 @@ public class LocationUpdateService extends Service implements LocationListener {
                     request.setHeader(headkey, (String)headers.getString(headkey));
                 }
             }
-
-            Log.i(TAG, "SS 55");
 
             Log.d(TAG, "Posting to " + request.getURI().toString());
             HttpResponse response = httpClient.execute(request);
@@ -905,44 +888,40 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private void postNotification(String info, String loc, int cardId){
-        //Intent notificationServiceIntent;
-        //notificationServiceIntent = new Intent(this, LifeshareNotificationService.class);
-        //PendingIntent pintent = PendingIntent.getService(mContext, 0, notificationServiceIntent, 0);
-
-        //Intent snoozeIntent = new Intent("confirm");
-        //PendingIntent piSnooze = PendingIntent.getService(this, 0, snoozeIntent, 0);
-
+        //Function for sending notifications to the user. Could be for card processing or just general info
         Notification.Builder shareLocBuilder = new Notification.Builder(this);
         shareLocBuilder.setContentTitle("Lifeshare Card");
         shareLocBuilder.setContentText(info + " " + loc);
         shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
 
-        int notifiId = getNotificationId();
+        if (cardId >= 0){
+            int notifiId = getNotificationId();
 
-        //Construct the Confirm Action button for the notification
-        //We need to create a specific intent or else the putExtra data will be overwritten be the new notification
-        Intent notificationConfirmIntent = new Intent(NOTIFICATION_CONFIRM_ACTION+notifiId);
-        //We need to notify the broadcast listener to listen for the new created intent
-        registerReceiver(notificatinConfirmReceiver, new IntentFilter(NOTIFICATION_CONFIRM_ACTION+notifiId));
-        //For the discard action we only need the notification id
-        notificationConfirmIntent.putExtra(NOTIFICATION_ARG_ID, notifiId);
-        notificationConfirmIntent.putExtra(NOTIFICATION_ARG_CARD_ID, cardId);
-        //We create the Pending intent using the created intent. FLAG_UPDATE_CURRENT is needed or else the putExtra does not "put" the data
-        PendingIntent piConfirm = PendingIntent.getBroadcast(this, 0, notificationConfirmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        //We add the created intent to the notification
-        shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", piConfirm);
+            //Construct the Confirm Action button for the notification
+            //We need to create a specific intent or else the putExtra data will be overwritten be the new notification
+            Intent notificationConfirmIntent = new Intent(NOTIFICATION_CONFIRM_ACTION+notifiId);
+            //We need to notify the broadcast listener to listen for the new created intent
+            registerReceiver(notificatinConfirmReceiver, new IntentFilter(NOTIFICATION_CONFIRM_ACTION+notifiId));
+            //For the discard action we only need the notification id
+            notificationConfirmIntent.putExtra(NOTIFICATION_ARG_ID, notifiId);
+            notificationConfirmIntent.putExtra(NOTIFICATION_ARG_CARD_ID, cardId);
+            //We create the Pending intent using the created intent. FLAG_UPDATE_CURRENT is needed or else the putExtra does not "put" the data
+            PendingIntent piConfirm = PendingIntent.getBroadcast(this, 0, notificationConfirmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            //We add the created intent to the notification
+            shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", piConfirm);
 
-        //Construct the Discard Action button for the notification
-        //We need to create a specific intent or else the putExtra data will be overwritten be the new notification
-        Intent notificationDiscardIntent = new Intent(NOTIFICATION_DISCARD_ACTION+notifiId);
-        //We need to notify the broadcast listener to listen for the new created intent
-        registerReceiver(notificatinDiscardReceiver, new IntentFilter(NOTIFICATION_DISCARD_ACTION+notifiId));
-        //For the discard action we only need the notification id
-        notificationDiscardIntent.putExtra(NOTIFICATION_ARG_ID, notifiId);
-        //We create the Pending intent using the created intent. FLAG_UPDATE_CURRENT is needed or else the putExtra does not "put" the data
-        PendingIntent piDiscard = PendingIntent.getBroadcast(this, 0, notificationDiscardIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        //We add the created intent to the notification
-        shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", piDiscard);
+            //Construct the Discard Action button for the notification
+            //We need to create a specific intent or else the putExtra data will be overwritten be the new notification
+            Intent notificationDiscardIntent = new Intent(NOTIFICATION_DISCARD_ACTION+notifiId);
+            //We need to notify the broadcast listener to listen for the new created intent
+            registerReceiver(notificatinDiscardReceiver, new IntentFilter(NOTIFICATION_DISCARD_ACTION+notifiId));
+            //For the discard action we only need the notification id
+            notificationDiscardIntent.putExtra(NOTIFICATION_ARG_ID, notifiId);
+            //We create the Pending intent using the created intent. FLAG_UPDATE_CURRENT is needed or else the putExtra does not "put" the data
+            PendingIntent piDiscard = PendingIntent.getBroadcast(this, 0, notificationDiscardIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            //We add the created intent to the notification
+            shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", piDiscard);            
+        }
 
         Notification shareNotification;
         if (android.os.Build.VERSION.SDK_INT >= 16) {
@@ -954,13 +933,13 @@ public class LocationUpdateService extends Service implements LocationListener {
         //shareNotification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE;
         shareNotification.flags |= Notification.FLAG_ONGOING_EVENT;
 
-        NotificationManager mNotificationManager = (NotificationManager)
-                getSystemService(NOTIFICATION_SERVICE);
-            // Including the notification ID allows you to update the notification later on.
+        NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        // Including the notification ID allows you to update the notification later on.
         mNotificationManager.notify(notifiId, shareNotification);
     }
 
     private int getNotificationId() {
+        //Returns the next ID for the notifications
         SharedPreferences pref = mContext.getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);
         int currentNotId = pref.getInt("notificationId", 1);
 
@@ -971,10 +950,12 @@ public class LocationUpdateService extends Service implements LocationListener {
         return currentNotId;
     }
 
-    private String getInfo(){
-        Date currentdate = new Date();
+    private String getInfo(long cardTime){
+        //Function for defining user activity depending on the time of the day
+        Date currentdate = new Date(cardTime);
+
         DateFormat df = new SimpleDateFormat("HH");
-        String curInfo = "is at";
+        String curInfo = "is in";
         if (Integer.parseInt(df.format(currentdate)) <= 6){
             curInfo = "is sleeping";
         } else if (Integer.parseInt(df.format(currentdate)) >= 12 && Integer.parseInt(df.format(currentdate)) <=14){
