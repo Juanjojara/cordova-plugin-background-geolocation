@@ -686,6 +686,14 @@ public class LocationUpdateService extends Service implements LocationListener {
         public void onReceive(Context context, Intent intent)
         {            
             int notificationId = intent.getIntExtra(NOTIFICATION_ARG_ID, -1);
+            int notificationCardId = intent.getIntExtra(NOTIFICATION_ARG_CARD_ID, -1);
+            if (notificationCardId > 0){
+                CardDAO cdao = DAOFactory.createCardDAO(context);
+                com.tenforwardconsulting.cordova.bgloc.data.Card confirmCard = cdao.getCardById("pending_confirm", notificationCardId);
+                if (confirmCard != null){
+                    cdao.deleteCard("pending_confirm", confirmCard);
+                }                
+            }
             NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
             if (notificationId>=0){
                 mNotificationManager.cancel(notificationId);
@@ -1054,6 +1062,8 @@ public class LocationUpdateService extends Service implements LocationListener {
         toneGenerator.release();
         CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
         cdao.closeDB();
+        NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        mNotificationManager.cancelAll();
         
         unregisterReceiver(stationaryAlarmReceiver);
         unregisterReceiver(singleUpdateReceiver);
@@ -1133,11 +1143,9 @@ public class LocationUpdateService extends Service implements LocationListener {
             CardDAO cdao = DAOFactory.createCardDAO(LocationUpdateService.this.getApplicationContext());
             com.tenforwardconsulting.cordova.bgloc.data.Card confirmCard = cdao.getCardById("pending_confirm", notificationCardId);
             if (confirmCard != null){
-                Log.d(TAG, "Async CCCCCCCCCCCCC");
                 Log.i(TAG, "Confirm Sharing");
                 //Share the card
                 if (shareCard(confirmCard)){
-                    Log.d(TAG, "Async DDDDDDDDDDDDDDD");
                     //Store the shared card in the SHARED table
                     //This step could be removed in the future if we don't find a use for the already shared cards
                     if (cdao.persistCard("shared_cards", confirmCard)) {
@@ -1147,7 +1155,6 @@ public class LocationUpdateService extends Service implements LocationListener {
                     }
                 }
                 else{
-                    Log.d(TAG, "Async EEEEEEEEEEEEEEE");
                     //If we could not shared the card now, we store it in the DB for automatic sharing later
                     if (cdao.persistCard("pending_internet", confirmCard)) {
                         Log.d(TAG, "Persisted Card in pending_internet: " + confirmCard);
@@ -1158,11 +1165,9 @@ public class LocationUpdateService extends Service implements LocationListener {
                 }
                 //If  we successfully process the notification, we delete it and also the card from the pending confirmation table
                 if (confirmed_card){
-                    Log.d(TAG, "Async FFFFFFFFFFFFFFFFF");
                     cdao.deleteCard("pending_confirm", confirmCard);
                     NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
                     if (notificationId >= 0){
-                        Log.d(TAG, "Async GGGGGGGGGGGGGGGGGG");
                         mNotificationManager.cancel(notificationId);
                     }
                 }
