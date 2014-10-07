@@ -1064,6 +1064,10 @@ public class LocationUpdateService extends Service implements LocationListener {
         cdao.closeDB();
         NotificationManager mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         mNotificationManager.cancelAll();
+        SharedPreferences pref = mContext.getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);
+        SharedPreferences.Editor edit = pref.edit();
+        edit.putString("pending_notifications", "true");
+        edit.commit();
         
         unregisterReceiver(stationaryAlarmReceiver);
         unregisterReceiver(singleUpdateReceiver);
@@ -1120,9 +1124,17 @@ public class LocationUpdateService extends Service implements LocationListener {
                 }
             }
             //Get all the pending confirm cards from the DB and resend the notification
-            for (com.tenforwardconsulting.cordova.bgloc.data.Card savedConfirmCard : cardDAO.getCardsByTable("pending_confirm")) {
-                Log.d(TAG, "Sending pending confirm cards notifications");
-                postNotification(savedConfirmCard.getInfo(), savedConfirmCard.getLocation(), savedConfirmCard.getId());
+            SharedPreferences pref = mContext.getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);
+            String pending_notifications = pref.getString("pending_notifications", "true");
+            if (pending_notifications.equals("true")){ 
+                SharedPreferences.Editor edit = pref.edit();
+                edit.putString("pending_notifications", "false");
+                edit.commit();
+                
+                for (com.tenforwardconsulting.cordova.bgloc.data.Card savedConfirmCard : cardDAO.getCardsByTable("pending_confirm")) {
+                    Log.d(TAG, "Sending pending confirm cards notifications");
+                    postNotification(savedConfirmCard.getInfo(), savedConfirmCard.getLocation(), savedConfirmCard.getId());
+                }
             }
             return true;
         }
