@@ -1101,7 +1101,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                 if (shareCard(savedInternetCard)){
                     //Store the shared card in the SHARED table
                     //This step could be removed in the future if we don't find a use for the already shared cards
-                    if (cdao.persistCard("shared_cards", savedInternetCard)) {
+                    if (cardDAO.persistCard("shared_cards", savedInternetCard)) {
                         Log.d(TAG, "Persisted Card in shared_cards: " + savedInternetCard);
                     } else {
                         Log.w(TAG, "CARD SHARED! but failed to persist card in shared_cards table");
