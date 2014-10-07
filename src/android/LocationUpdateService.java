@@ -894,9 +894,8 @@ public class LocationUpdateService extends Service implements LocationListener {
         shareLocBuilder.setContentText(info + " " + loc);
         shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
 
+        int notifiId = getNotificationId();
         if (cardId >= 0){
-            int notifiId = getNotificationId();
-
             //Construct the Confirm Action button for the notification
             //We need to create a specific intent or else the putExtra data will be overwritten be the new notification
             Intent notificationConfirmIntent = new Intent(NOTIFICATION_CONFIRM_ACTION+notifiId);
