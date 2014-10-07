@@ -891,6 +891,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             registerReceiver(notificatinDiscardReceiver, new IntentFilter(NOTIFICATION_DISCARD_ACTION+notifiId));
             //For the discard action we only need the notification id
             notificationDiscardIntent.putExtra(NOTIFICATION_ARG_ID, notifiId);
+            notificationDiscardIntent.putExtra(NOTIFICATION_ARG_CARD_ID, cardId);
             //We create the Pending intent using the created intent. FLAG_UPDATE_CURRENT is needed or else the putExtra does not "put" the data
             PendingIntent piDiscard = PendingIntent.getBroadcast(this, 0, notificationDiscardIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             //We add the created intent to the notification
@@ -1099,8 +1100,21 @@ public class LocationUpdateService extends Service implements LocationListener {
         @Override
         protected Boolean doInBackground(Object...objects) {
             Log.d(TAG, "Executing PostLocationTask#doInBackground");
-            //Get all the processing pending cards from the DB
             CardDAO cardDAO = DAOFactory.createCardDAO(LocationUpdateService.this.getApplicationContext());
+            //Get all the pending confirm cards from the DB and resend the notification
+            SharedPreferences pref = mContext.getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);
+            String pending_notifications = pref.getString("pending_notifications", "true");
+            if (pending_notifications.equals("true")){ 
+                SharedPreferences.Editor edit = pref.edit();
+                edit.putString("pending_notifications", "false");
+                edit.commit();
+                
+                for (com.tenforwardconsulting.cordova.bgloc.data.Card savedConfirmCard : cardDAO.getCardsByTable("pending_confirm")) {
+                    Log.d(TAG, "Sending pending confirm cards notifications");
+                    postNotification(savedConfirmCard.getInfo(), savedConfirmCard.getLocation(), savedConfirmCard.getId());
+                }
+            }
+            //Get all the processing pending cards from the DB
             for (com.tenforwardconsulting.cordova.bgloc.data.Card savedGeoCard : cardDAO.geoPendingCards()) {
                 Log.d(TAG, "Posting saved card");
                 //If we can successfully process the card, we delete it from the pending table
@@ -1121,19 +1135,6 @@ public class LocationUpdateService extends Service implements LocationListener {
                         Log.w(TAG, "CARD SHARED! but failed to persist card in shared_cards table");
                     }
                     cardDAO.deleteCard("pending_internet", savedInternetCard);
-                }
-            }
-            //Get all the pending confirm cards from the DB and resend the notification
-            SharedPreferences pref = mContext.getSharedPreferences("lifesharePreferences", Context.MODE_MULTI_PROCESS);
-            String pending_notifications = pref.getString("pending_notifications", "true");
-            if (pending_notifications.equals("true")){ 
-                SharedPreferences.Editor edit = pref.edit();
-                edit.putString("pending_notifications", "false");
-                edit.commit();
-                
-                for (com.tenforwardconsulting.cordova.bgloc.data.Card savedConfirmCard : cardDAO.getCardsByTable("pending_confirm")) {
-                    Log.d(TAG, "Sending pending confirm cards notifications");
-                    postNotification(savedConfirmCard.getInfo(), savedConfirmCard.getLocation(), savedConfirmCard.getId());
                 }
             }
             return true;
