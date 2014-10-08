@@ -165,8 +165,8 @@ public class LocationUpdateService extends Service implements LocationListener {
         registerReceiver(singleUpdateReceiver, new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION));
         
         // Notification Confirm Monitor PI
-        notificationConfirmPI   = PendingIntent.getBroadcast(this, 0, new Intent(NOTIFICATION_CONFIRM_ACTION), 0);
-        registerReceiver(notificatinConfirmReceiver, new IntentFilter(NOTIFICATION_CONFIRM_ACTION));
+        //notificationConfirmPI   = PendingIntent.getBroadcast(this, 0, new Intent(NOTIFICATION_CONFIRM_ACTION), 0);
+        //registerReceiver(notificatinConfirmReceiver, new IntentFilter(NOTIFICATION_CONFIRM_ACTION));
 
         // Notification Discard Monitor PI
         //notificationDiscardPI   = PendingIntent.getBroadcast(this, 0, new Intent(NOTIFICATION_DISCARD_ACTION), 0);
@@ -751,9 +751,9 @@ public class LocationUpdateService extends Service implements LocationListener {
                 
                 String curAdd = getAddress(Double.parseDouble(geoCard.getLatitude()), Double.parseDouble(geoCard.getLongitude()), geoCard.getLocation_level());
                 if (curAdd == null){
-                    if (isNetworkConnected()){
+                    /*if (isNetworkConnected()){
                         postNotification("Error", "Please restart the application. If the problem persists maybe yuo need to restart also the device", -1);
-                    }
+                    }*/
                     return false;                    
                 }
                 String curInfo = getInfo(geoCard.getCreated());
@@ -764,18 +764,18 @@ public class LocationUpdateService extends Service implements LocationListener {
                 String lastAdd = pref.getString("lastAddress", "");
                 String lastInfo = pref.getString("lastInfo", "");
 
-                /*if (curAdd.equals(lastAdd) && curInfo.equals(lastInfo)){
+                if (curAdd.equals(lastAdd) && curInfo.equals(lastInfo)){
                     Log.i(TAG, "repeated card");
                     //postNotification(curInfo, curAdd + " (Not shared)", -1);
                     return true;
-                }else{*/
+                }else{
                     Log.i(TAG, "new card");
                     edit.putString("lastAddress", curAdd);
                     edit.putString("lastInfo", curInfo);
                     edit.commit();
                     geoCard.setInfo(curInfo);
                     geoCard.setLocation(curAdd);
-                //}
+                }
 
                 CardDAO cdao = DAOFactory.createCardDAO(this.getApplicationContext());
 
