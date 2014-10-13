@@ -9,16 +9,22 @@
 #import <AudioToolbox/AudioToolbox.h>
 
 @interface CDVBackgroundGeoLocation : CDVPlugin <CLLocationManagerDelegate>
+
+@property (nonatomic, strong) NSString* syncCallbackId;
+@property (nonatomic, strong) NSMutableArray* stationaryRegionListeners;
+
 - (void) configure:(CDVInvokedUrlCommand*)command;
 - (void) start:(CDVInvokedUrlCommand*)command;
 - (void) stop:(CDVInvokedUrlCommand*)command;
 - (void) finish:(CDVInvokedUrlCommand*)command;
 - (void) onPaceChange:(CDVInvokedUrlCommand*)command;
 - (void) setConfig:(CDVInvokedUrlCommand*)command;
-
+- (void) addStationaryRegionListener:(CDVInvokedUrlCommand*)command;
+- (void) getStationaryLocation:(CDVInvokedUrlCommand *)command;
 - (void) sync:(CLLocation*)location;
 - (void) onSuspend:(NSNotification *)notification;
 - (void) onResume:(NSNotification *)notification;
+- (void) onAppTerminate;
 
 @end
 
