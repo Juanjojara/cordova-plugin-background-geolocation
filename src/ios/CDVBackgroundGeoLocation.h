@@ -21,7 +21,6 @@
 - (void) setConfig:(CDVInvokedUrlCommand*)command;
 - (void) addStationaryRegionListener:(CDVInvokedUrlCommand*)command;
 - (void) getStationaryLocation:(CDVInvokedUrlCommand *)command;
-- (void) sync:(CLLocation*)location;
 - (void) onSuspend:(NSNotification *)notification;
 - (void) onResume:(NSNotification *)notification;
 - (void) onAppTerminate;
