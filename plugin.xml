@@ -58,7 +58,7 @@
         <!-- required background modes:  App registers for location updates -->
         
         <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription">
-            <string>This app requires background location tracking</string>
+            <string>This app requires background location tracking to create the postcards that will be shared</string>
         </config-file>
 
         <config-file target="*-Info.plist" parent="UIBackgroundModes">

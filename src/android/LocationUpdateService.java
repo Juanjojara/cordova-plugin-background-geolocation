@@ -102,8 +102,6 @@ public class LocationUpdateService extends Service implements LocationListener {
     private long stationaryLocationPollingInterval;
     private PendingIntent stationaryRegionPI;
     private PendingIntent singleUpdatePI;
-    private PendingIntent notificationConfirmPI;
-    //private PendingIntent notificationDiscardPI;
     
     private Boolean isMoving = false;
     private Boolean isAcquiringStationaryLocation = false;
@@ -117,6 +115,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private Boolean isDebugging;
     private String notificationTitle = "Background checking";
     private String notificationText = "ENABLED";
+    private Boolean stopOnTerminate;
 
     private ToneGenerator toneGenerator;
     
@@ -165,11 +164,9 @@ public class LocationUpdateService extends Service implements LocationListener {
         registerReceiver(singleUpdateReceiver, new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION));
         
         // Notification Confirm Monitor PI
-        //notificationConfirmPI   = PendingIntent.getBroadcast(this, 0, new Intent(NOTIFICATION_CONFIRM_ACTION), 0);
         registerReceiver(notificatinConfirmReceiver, new IntentFilter(NOTIFICATION_CONFIRM_ACTION));
 
         // Notification Discard Monitor PI
-        //notificationDiscardPI   = PendingIntent.getBroadcast(this, 0, new Intent(NOTIFICATION_DISCARD_ACTION), 0);
         registerReceiver(notificatinDiscardReceiver, new IntentFilter(NOTIFICATION_DISCARD_ACTION));
         
         ////
