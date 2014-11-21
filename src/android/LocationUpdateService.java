@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
 import com.tenforwardconsulting.cordova.bgloc.data.CardDAO;
+import com.tenforwardconsulting.cordova.bgloc.data.Globalization;
 
 import android.annotation.TargetApi;
 
@@ -748,9 +749,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                 
                 String curAdd = getAddress(Double.parseDouble(geoCard.getLatitude()), Double.parseDouble(geoCard.getLongitude()), geoCard.getLocation_level());
                 if (curAdd == null){
-                    /*if (isNetworkConnected()){
-                        postNotification("Error", "Please restart the application. If the problem persists maybe yuo need to restart also the device", -1);
-                    }*/
+                    Log.i(TAG, "Error getting Address");
                     return false;                    
                 }
                 String curInfo = getInfo(geoCard.getCreated());
@@ -763,7 +762,6 @@ public class LocationUpdateService extends Service implements LocationListener {
 
                 if (curAdd.equals(lastAdd) && curInfo.equals(lastInfo)){
                     Log.i(TAG, "repeated card");
-                    //postNotification(curInfo, curAdd + " (Not shared)", -1);
                     return true;
                 }else{
                     Log.i(TAG, "new card");
@@ -925,6 +923,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private String getInfo(long cardTime){
         //Function for defining user activity depending on the time of the day
         Date currentdate = new Date(cardTime);
+        Globalization curGlob = new Globalization();
 
         DateFormat df = new SimpleDateFormat("HH");
         String curInfo = "is in";
