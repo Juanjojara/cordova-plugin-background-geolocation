@@ -926,11 +926,14 @@ public class LocationUpdateService extends Service implements LocationListener {
         Globalization curGlob = new Globalization(mContext);
 
         DateFormat df = new SimpleDateFormat("HH");
-        String curInfo = "is in";
+        //String curInfo = "is in";
+        String curInfo = curGlob.getValue("info_isin");
         if (Integer.parseInt(df.format(currentdate)) <= 6){
-            curInfo = "is sleeping";
+            //curInfo = "is sleeping";
+            curInfo = curGlob.getValue("info_sleep");
         } else if (Integer.parseInt(df.format(currentdate)) >= 12 && Integer.parseInt(df.format(currentdate)) <=14){
-            curInfo = "is having lunch";
+            //curInfo = "is having lunch";
+            curInfo = curGlob.getValue("info_lunch");
         }
         return curInfo;
     }
