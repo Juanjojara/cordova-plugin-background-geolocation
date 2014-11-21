@@ -923,7 +923,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private String getInfo(long cardTime){
         //Function for defining user activity depending on the time of the day
         Date currentdate = new Date(cardTime);
-        Globalization curGlob = new Globalization();
+        Globalization curGlob = new Globalization(mContext);
 
         DateFormat df = new SimpleDateFormat("HH");
         String curInfo = "is in";
