@@ -20,7 +20,7 @@ public class Globalization {
 	private String langCode;
 
 	public Globalization(Context mContext){
-		Configuration config = getResources().getConfiguration();
+		Configuration config = mContext.getResources().getConfiguration();
 		Locale current = config.locale;
 		langCode = current.getLanguage();
 		Log.i(TAG, "Language Code: " + langCode);
