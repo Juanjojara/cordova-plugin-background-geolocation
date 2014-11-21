@@ -27,6 +27,7 @@ public class Globalization {
 	}
 
 	public String getValue(String key){
-
+		String result = "";
+		return result;
 	}
 }
