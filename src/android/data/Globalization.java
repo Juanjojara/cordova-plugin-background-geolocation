@@ -39,6 +39,9 @@ public class Globalization {
             case "es":
                 result = getValueES(key);;
                 break;
+            case "po":
+                result = getValuePO(key);;
+                break;
             default: 
                 result = getValueEN(key);
                 break;
@@ -169,4 +172,35 @@ public class Globalization {
         }
 		return result;
 	}
+
+    private String getValuePO(String key){
+        String result = "";
+        switch (key.toLowerCase()) {
+            case NOT_TITLE:
+                result = "Lifeshare pocztówka";
+                break;
+            case NOT_BTN_CONFIRM:
+                result = "potwierdzać";
+                break;
+            case NOT_BTN_DISCARD:
+                result = "odrzucać";
+                break;
+            case INFO_ISIN:
+                result = "jest w";
+                break;
+            case INFO_LUNCH:
+                result = "je obiad";
+                break;
+            case INFO_SLEEP:
+                result = "śpi";
+                break;
+            case INFO_UNAVAILABLE:
+                result = "niedostępny";
+                break;
+            default: 
+                result = "";
+                break;
+        }
+        return result;
+    }
 }
