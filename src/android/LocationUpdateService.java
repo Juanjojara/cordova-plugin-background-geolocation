@@ -860,7 +860,8 @@ public class LocationUpdateService extends Service implements LocationListener {
     private void postNotification(String info, String loc, int cardId){
         //Function for sending notifications to the user. Could be for card processing or just general info
         Notification.Builder shareLocBuilder = new Notification.Builder(this);
-        shareLocBuilder.setContentTitle("Lifeshare Card");
+        Globalization curGlob = new Globalization(mContext);
+        shareLocBuilder.setContentTitle(curGlob.getValue("not_title"));
         shareLocBuilder.setContentText(info + " " + loc);
         shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
 
@@ -944,7 +945,9 @@ public class LocationUpdateService extends Service implements LocationListener {
         String revCity = null;
         String revRegion =  null;
         String revCountry = null;
-        String add = "unavailable";
+        Globalization curGlob = new Globalization(mContext);
+        String add = curGlob.getValue("info_unavailable");
+
         try {
             List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
             if (addresses != null)

@@ -9,13 +9,14 @@ import android.util.Log;
 
 
 public class Globalization {
-	private static final String TAG = "LocationUpdateService";
-	private static final String NOT_TITLE = "Lifeshare Postcard";
-	private static final String NOT_TEXT = "";
-	private static final String INFO_ISIN = "is in";
-	private static final String INFO_LUNCH = "is having lunch";
-	private static final String INFO_SLEEP = "is sleeping";
-	private static final String INFO_UNAVAILABLE = "unavailable";
+	public static final String TAG = "LocationUpdateService";
+	public static final String NOT_TITLE = "not_title";
+	public static final String NOT_BTN_CONFIRM = "not_btn_confirm";
+	public static final String NOT_BTN_DISCARD = "not_btn_discard";
+	public static final String INFO_ISIN = "info_isin";
+	public static final String INFO_LUNCH = "info_lunch";
+	public static final String INFO_SLEEP = "info_sleep";
+	public static final String INFO_UNAVAILABLE = "info_unavailable";
 
 	private String langCode;
 
@@ -30,13 +31,13 @@ public class Globalization {
 		String result = "";
 		switch (langCode.toLowerCase()) {
 			case "it":
-                result = "Lifeshare Postcard";
+                result = getValueIT(key);;
                 break;
             case "ru":
-                result = "Lifeshare Postcard";
+                result = getValueRU(key);;
                 break;
             case "es":
-                result = "Lifeshare Postcard";
+                result = getValueES(key);;
                 break;
             default: 
                 result = getValueEN(key);
@@ -48,20 +49,20 @@ public class Globalization {
 	private String getValueEN(String key){
 		String result = "";
 		switch (key.toLowerCase()) {
-            case "not_title":
+            case NOT_TITLE:
                 result = "Lifeshare Postcard";
                 break;
-            case "info_isin":
-                result = "Lifeshare Postcard";
+            case INFO_ISIN:
+                result = "is in";
                 break;
-            case "info_lunch":
-                result = "Lifeshare Postcard";
+            case INFO_LUNCH:
+                result = "is having lunch";
                 break;
-            case "info_sleep":
-                result = "Lifeshare Postcard";
+            case INFO_SLEEP:
+                result = "is sleeping";
                 break;
-            case "info_unavailable":
-                result = "Lifeshare Postcard";
+            case INFO_UNAVAILABLE:
+                result = "unavailable";
                 break;
             default: 
                 result = "";
