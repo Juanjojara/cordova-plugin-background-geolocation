@@ -39,8 +39,8 @@ public class Globalization {
             case "es":
                 result = getValueES(key);;
                 break;
-            case "po":
-                result = getValuePO(key);;
+            case "pl":
+                result = getValuePL(key);;
                 break;
             default: 
                 result = getValueEN(key);
@@ -173,7 +173,7 @@ public class Globalization {
 		return result;
 	}
 
-    private String getValuePO(String key){
+    private String getValuePL(String key){
         String result = "";
         switch (key.toLowerCase()) {
             case NOT_TITLE:
