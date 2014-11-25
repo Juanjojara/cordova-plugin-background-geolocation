@@ -52,6 +52,12 @@ public class Globalization {
             case NOT_TITLE:
                 result = "Lifeshare Postcard";
                 break;
+            case NOT_BTN_CONFIRM:
+                result = "Confirm";
+                break;
+            case NOT_BTN_DISCARD:
+                result = "Discard";
+                break;
             case INFO_ISIN:
                 result = "is in";
                 break;
@@ -74,19 +80,25 @@ public class Globalization {
 	private String getValueIT(String key){
 		String result = "";
 		switch (key.toLowerCase()) {
-            case "not_title":
+            case NOT_TITLE:
                 result = "Lifeshare Cartolina";
                 break;
-            case "info_isin":
+            case NOT_BTN_CONFIRM:
+                result = "Confermare";
+                break;
+            case NOT_BTN_DISCARD:
+                result = "Scartare";
+                break;
+            case INFO_ISIN:
                 result = "e’ a";
                 break;
-            case "info_lunch":
+            case INFO_LUNCH:
                 result = "sta pranzando";
                 break;
-            case "info_sleep":
+            case INFO_SLEEP:
                 result = "sta dormendo";
                 break;
-            case "info_unavailable":
+            case INFO_UNAVAILABLE:
                 result = "Non disponibile";
                 break;
             default: 
@@ -99,19 +111,25 @@ public class Globalization {
 	private String getValueES(String key){
 		String result = "";
 		switch (key.toLowerCase()) {
-            case "not_title":
+            case NOT_TITLE:
                 result = "Lifeshare Postal";
                 break;
-            case "info_isin":
+            case NOT_BTN_CONFIRM:
+                result = "Confirmar";
+                break;
+            case NOT_BTN_DISCARD:
+                result = "Descartar";
+                break;
+            case INFO_ISIN:
                 result = "está en";
                 break;
-            case "info_lunch":
+            case INFO_LUNCH:
                 result = "está almorzando";
                 break;
-            case "info_sleep":
+            case INFO_SLEEP:
                 result = "está durmiendo";
                 break;
-            case "info_unavailable":
+            case INFO_UNAVAILABLE:
                 result = "No disponible";
                 break;
             default: 
@@ -124,19 +142,25 @@ public class Globalization {
 	private String getValueRU(String key){
 		String result = "";
 		switch (key.toLowerCase()) {
-            case "not_title":
+            case NOT_TITLE:
                 result = "Lifeshare открытка";
                 break;
-            case "info_isin":
+            case NOT_BTN_CONFIRM:
+                result = "подтвердить";
+                break;
+            case NOT_BTN_DISCARD:
+                result = "отбрасывать";
+                break;
+            case INFO_ISIN:
                 result = "в";
                 break;
-            case "info_lunch":
+            case INFO_LUNCH:
                 result = "обедаю";
                 break;
-            case "info_sleep":
+            case INFO_SLEEP:
                 result = "сплю";
                 break;
-            case "info_unavailable":
+            case INFO_UNAVAILABLE:
                 result = "недоступен";
                 break;
             default: 

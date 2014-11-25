@@ -861,7 +861,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         //Function for sending notifications to the user. Could be for card processing or just general info
         Notification.Builder shareLocBuilder = new Notification.Builder(this);
         Globalization curGlob = new Globalization(mContext);
-        shareLocBuilder.setContentTitle(curGlob.getValue("not_title"));
+        shareLocBuilder.setContentTitle(curGlob.getValue(Globalization.NOT_TITLE));
         shareLocBuilder.setContentText(info + " " + loc);
         shareLocBuilder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
 
@@ -878,7 +878,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             //We create the Pending intent using the created intent. FLAG_UPDATE_CURRENT is needed or else the putExtra does not "put" the data
             PendingIntent piConfirm = PendingIntent.getBroadcast(this, 0, notificationConfirmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             //We add the created intent to the notification
-            shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, "Confirm", piConfirm);
+            shareLocBuilder.addAction(android.R.drawable.ic_menu_agenda, curGlob.getValue(Globalization.NOT_BTN_CONFIRM), piConfirm);
 
             //Construct the Discard Action button for the notification
             //We need to create a specific intent or else the putExtra data will be overwritten be the new notification
@@ -891,7 +891,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             //We create the Pending intent using the created intent. FLAG_UPDATE_CURRENT is needed or else the putExtra does not "put" the data
             PendingIntent piDiscard = PendingIntent.getBroadcast(this, 0, notificationDiscardIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             //We add the created intent to the notification
-            shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Discard", piDiscard);            
+            shareLocBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, curGlob.getValue(Globalization.NOT_BTN_DISCARD), piDiscard);            
         }
 
         Notification shareNotification;
@@ -928,13 +928,13 @@ public class LocationUpdateService extends Service implements LocationListener {
 
         DateFormat df = new SimpleDateFormat("HH");
         //String curInfo = "is in";
-        String curInfo = curGlob.getValue("info_isin");
+        String curInfo = curGlob.getValue(Globalization.INFO_ISIN);
         if (Integer.parseInt(df.format(currentdate)) <= 6){
             //curInfo = "is sleeping";
-            curInfo = curGlob.getValue("info_sleep");
+            curInfo = curGlob.getValue(Globalization.INFO_SLEEP);
         } else if (Integer.parseInt(df.format(currentdate)) >= 12 && Integer.parseInt(df.format(currentdate)) <=14){
             //curInfo = "is having lunch";
-            curInfo = curGlob.getValue("info_lunch");
+            curInfo = curGlob.getValue(Globalization.INFO_LUNCH);
         }
         return curInfo;
     }
@@ -946,7 +946,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         String revRegion =  null;
         String revCountry = null;
         Globalization curGlob = new Globalization(mContext);
-        String add = curGlob.getValue("info_unavailable");
+        String add = curGlob.getValue(Globalization.INFO_UNAVAILABLE);
 
         try {
             List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
