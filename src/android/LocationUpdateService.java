@@ -762,7 +762,7 @@ public class LocationUpdateService extends Service implements LocationListener {
 
                 if (curAdd.equals(lastAdd) && curInfo.equals(lastInfo)){
                     Log.i(TAG, "repeated card");
-                    return true;
+                    //return true;
                 }else{
                     Log.i(TAG, "new card");
                     edit.putString("lastAddress", curAdd);
