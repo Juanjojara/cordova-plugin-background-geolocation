@@ -814,6 +814,29 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
     }
 
+    private boolean getPlace(){
+        try {
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            String place_api_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=500&types=food&name=cruise&key=AIzaSyAcMdSWYY56SKeMBIFtCHWnXXNfmn5tnj8";
+            HttpPost request = new HttpPost(place_api_url);
+  
+//            request.setHeader("Content-type", "application/json");
+
+            Log.d(TAG, "Posting to " + request.getURI().toString());
+            HttpResponse response = httpClient.execute(request);
+            Log.i(TAG, "Response received: " + response.getStatusLine());
+            if ((response.getStatusLine().getStatusCode() == 200) || (response.getStatusLine().getStatusCode() == 204)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Throwable e) {
+            Log.w(TAG, "Exception getting Place from API: " + e);
+            e.printStackTrace();
+            return false;
+        }        
+    }
+
     private boolean shareCard(com.tenforwardconsulting.cordova.bgloc.data.Card geoCard){
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
