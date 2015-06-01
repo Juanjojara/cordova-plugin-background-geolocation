@@ -814,29 +814,6 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
     }
 
-    private boolean getPlace(){
-        try {
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-            String place_api_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=500&types=food&name=cruise&key=AIzaSyAcMdSWYY56SKeMBIFtCHWnXXNfmn5tnj8";
-            HttpPost request = new HttpPost(place_api_url);
-  
-//            request.setHeader("Content-type", "application/json");
-
-            Log.d(TAG, "Posting to " + request.getURI().toString());
-            HttpResponse response = httpClient.execute(request);
-            Log.i(TAG, "Response received: " + response.getStatusLine());
-            if ((response.getStatusLine().getStatusCode() == 200) || (response.getStatusLine().getStatusCode() == 204)) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Throwable e) {
-            Log.w(TAG, "Exception getting Place from API: " + e);
-            e.printStackTrace();
-            return false;
-        }        
-    }
-
     private boolean shareCard(com.tenforwardconsulting.cordova.bgloc.data.Card geoCard){
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -963,41 +940,76 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private String getAddress(double lat, double lng, String location_setting) {
-        //We create a string location by reverse geoCoding the latitude and longitude values 
-        Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
-        String revCity = null;
-        String revRegion =  null;
-        String revCountry = null;
         Globalization curGlob = new Globalization(mContext);
         String add = curGlob.getValue(Globalization.INFO_UNAVAILABLE);
 
-        try {
-            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
-            if (addresses != null)
-                if (!addresses.isEmpty()) {
-                    Address obj = addresses.get(0);
-                    if (obj.getLocality() != null)
-                        revCity = obj.getLocality();
-                    if (obj.getAdminArea() != null)
-                        revRegion = obj.getAdminArea();
-                    if (obj.getCountryName() != null)
-                        revCountry = obj.getCountryName();
+        if (location_level(userloc_setting) <= 0){
+            add = getPlace(lat, lng);
+        }
 
-                    add = prepareLocation(revCity, revRegion, revCountry, location_setting);
-                }
-        } catch (IOException e) {
-            e.printStackTrace();
-            message = "Error during reverse geocoding. " + e.getMessage();
-            add = null;
+        if ((add.equals(curGlob.getValue(Globalization.INFO_UNAVAILABLE))) || (location_level(userloc_setting) <= 1)){
+            //We create a string location by reverse geoCoding the latitude and longitude values 
+            Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+            String revCity = null;
+            String revRegion =  null;
+            String revCountry = null;
+
+            try {
+                List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+                if (addresses != null)
+                    if (!addresses.isEmpty()) {
+                        Address obj = addresses.get(0);
+                        if (obj.getLocality() != null)
+                            revCity = obj.getLocality();
+                        if (obj.getAdminArea() != null)
+                            revRegion = obj.getAdminArea();
+                        if (obj.getCountryName() != null)
+                            revCountry = obj.getCountryName();
+
+                        add = prepareLocation(revCity, revRegion, revCountry, location_setting);
+                    }
+            } catch (IOException e) {
+                e.printStackTrace();
+                message = "Error during reverse geocoding. " + e.getMessage();
+                add = null;
+            }            
         }
         return add;
+    }
+
+    private String getPlace(double lat, double lng){
+        try {
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            String placesTypes = "airport|amusement_park|aquarium|art_gallery|bakery|bus_station|cafe|campground|church|city_hall|embassy|food|grocery_or_supermarket|gym|health|hindu_temple|library|local_government_office|lodging|mosque|movie_theater|museum|park|place_of_worship|post_office|restaurant|school|shopping_mall|spa|stadium|subway_station|synagogue|train_station|university|zoo";
+            String place_api_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=50&types=" + placesTypes + "&key=AIzaSyAcMdSWYY56SKeMBIFtCHWnXXNfmn5tnj8";
+
+            HttpGet request = new HttpGet(place_api_url);
+  
+//            request.setHeader("Content-type", "application/json");
+
+            Log.d(TAG, "Getting from " + request.getURI().toString());
+            HttpResponse response = httpClient.execute(request);
+            Log.i(TAG, "Response received: " + response.getStatusLine());
+            if ((response.getStatusLine().getStatusCode() == 200) || (response.getStatusLine().getStatusCode() == 204)) {
+                Log.d(TAG, "Http Response: " + response.toString());
+                Log.d(TAG, "PLACE OK");
+                return "PLACE OK";
+            } else {
+                Log.d(TAG, "PLACE FAIL");
+                return curGlob.getValue(Globalization.INFO_UNAVAILABLE);
+            }
+        } catch (Throwable e) {
+            Log.w(TAG, "Exception getting Place from API: " + e);
+            e.printStackTrace();
+            return curGlob.getValue(Globalization.INFO_UNAVAILABLE);
+        }        
     }
 
     private String prepareLocation(String curCity, String curRegion, String curCountry, String userloc_setting){
         //Create a unique string location accoriding to the location data and the location detail settings 
         int loc_level = location_level(userloc_setting);
-        String curLocation = "unavailable. City: " + curCity + ". Reg: " + curRegion + ". Coun: " + curCountry + ". Sets: " + loc_level;
-        if ((curCity != null) && (location_level(userloc_setting) <= 0)){
+        String curLocation = curGlob.getValue(Globalization.INFO_UNAVAILABLE);
+        if ((curCity != null) && (location_level(userloc_setting) <= 1)){
             curLocation = curCity;
             if (curRegion != null){
                 curLocation = curLocation + ", " + curRegion;
@@ -1005,12 +1017,12 @@ public class LocationUpdateService extends Service implements LocationListener {
             if (curCountry != null){
                 curLocation = curLocation + ", " + curCountry;
             }
-        }else if ((curRegion != null) && (location_level(userloc_setting) <= 1)){
+        }else if ((curRegion != null) && (location_level(userloc_setting) <= 2)){
             curLocation = curRegion;
             if (curCountry != null){
                 curLocation = curLocation + ", " + curCountry;
             }
-        }else if ((curCountry != null) && (location_level(userloc_setting) <= 2)){
+        }else if ((curCountry != null) && (location_level(userloc_setting) <= 3)){
             curLocation = curCountry;
         }
         return curLocation;      
@@ -1018,13 +1030,15 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     private int location_level(String loc_level){
         //Converts a location level representation to a number for better comparison
-        int ret_level = 3;
-        if (loc_level.equals("city"))
+        int ret_level = 4;
+        if (loc_level.equals("place"))
             ret_level = 0;
-        if (loc_level.equals("region"))
+        if (loc_level.equals("city"))
             ret_level = 1;
-        if (loc_level.equals("country"))
+        if (loc_level.equals("region"))
             ret_level = 2;
+        if (loc_level.equals("country"))
+            ret_level = 3;
         
         return ret_level;
     }
