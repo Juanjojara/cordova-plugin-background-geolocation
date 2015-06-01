@@ -943,11 +943,11 @@ public class LocationUpdateService extends Service implements LocationListener {
         Globalization curGlob = new Globalization(mContext);
         String add = curGlob.getValue(Globalization.INFO_UNAVAILABLE);
 
-        if (location_level(userloc_setting) <= 0){
+        if (location_level(location_setting) <= 0){
             add = getPlace(lat, lng);
         }
 
-        if ((add.equals(curGlob.getValue(Globalization.INFO_UNAVAILABLE))) || (location_level(userloc_setting) <= 1)){
+        if ((add.equals(curGlob.getValue(Globalization.INFO_UNAVAILABLE))) || (location_level(location_setting) <= 1)){
             //We create a string location by reverse geoCoding the latitude and longitude values 
             Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
             String revCity = null;
@@ -978,9 +978,9 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private String getPlace(double lat, double lng){
+        Globalization curGlob = new Globalization(mContext);
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
-            Globalization curGlob = new Globalization(mContext);
             String placesTypes = "airport|amusement_park|aquarium|art_gallery|bakery|bus_station|cafe|campground|church|city_hall|embassy|food|grocery_or_supermarket|gym|health|hindu_temple|library|local_government_office|lodging|mosque|movie_theater|museum|park|place_of_worship|post_office|restaurant|school|shopping_mall|spa|stadium|subway_station|synagogue|train_station|university|zoo";
             String place_api_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=50&types=" + placesTypes + "&key=AIzaSyAcMdSWYY56SKeMBIFtCHWnXXNfmn5tnj8";
 
