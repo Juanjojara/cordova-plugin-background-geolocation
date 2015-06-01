@@ -980,6 +980,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private String getPlace(double lat, double lng){
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
+            Globalization curGlob = new Globalization(mContext);
             String placesTypes = "airport|amusement_park|aquarium|art_gallery|bakery|bus_station|cafe|campground|church|city_hall|embassy|food|grocery_or_supermarket|gym|health|hindu_temple|library|local_government_office|lodging|mosque|movie_theater|museum|park|place_of_worship|post_office|restaurant|school|shopping_mall|spa|stadium|subway_station|synagogue|train_station|university|zoo";
             String place_api_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=50&types=" + placesTypes + "&key=AIzaSyAcMdSWYY56SKeMBIFtCHWnXXNfmn5tnj8";
 
@@ -1008,6 +1009,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private String prepareLocation(String curCity, String curRegion, String curCountry, String userloc_setting){
         //Create a unique string location accoriding to the location data and the location detail settings 
         int loc_level = location_level(userloc_setting);
+        Globalization curGlob = new Globalization(mContext);
         String curLocation = curGlob.getValue(Globalization.INFO_UNAVAILABLE);
         if ((curCity != null) && (location_level(userloc_setting) <= 1)){
             curLocation = curCity;
