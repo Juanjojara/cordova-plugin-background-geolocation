@@ -952,7 +952,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             add = getPlace(lat, lng);
         }
 
-        if ((add.equals(curGlob.getValue(Globalization.INFO_UNAVAILABLE))) || (location_level(location_setting) <= 1)){
+        if ((add.equals(curGlob.getValue(Globalization.INFO_UNAVAILABLE))) || (location_level(location_setting) >= 1)){
             //We create a string location by reverse geoCoding the latitude and longitude values 
             Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
             String revCity = null;
@@ -1014,6 +1014,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                     articles.getJSONObject(0) // get first article in the array
                     articles.getJSONObject(0).names() // get first article keys [title,url,categories,tags]
                     articles.getJSONObject(0).getString("url") // return an article url*/
+                    Log.d(TAG, "PLACE: " + result);
                     Log.d(TAG, "PLACE OK");
                 }else{
                     result = curGlob.getValue(Globalization.INFO_UNAVAILABLE);;
