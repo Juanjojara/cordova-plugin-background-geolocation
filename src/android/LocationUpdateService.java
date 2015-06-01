@@ -1,6 +1,9 @@
 package com.tenforwardconsulting.cordova.bgloc;
 
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Locale;
@@ -18,6 +21,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
@@ -993,9 +997,33 @@ public class LocationUpdateService extends Service implements LocationListener {
             HttpResponse response = httpClient.execute(request);
             Log.i(TAG, "Response received: " + response.getStatusLine());
             if ((response.getStatusLine().getStatusCode() == 200) || (response.getStatusLine().getStatusCode() == 204)) {
+                // receive response as inputStream
+                InputStream inputStream = null;
+                inputStream = response.getEntity().getContent();
+     
+                // convert inputstream to string
+                String result = "";
+                if(inputStream != null){
+                    String resultResponse = convertInputStreamToString(inputStream);
+                    JSONObject json = new JSONObject(resultResponse); // convert String to JSONObject
+                    JSONArray places = json.getJSONArray("results"); // get articles array
+                    result = places.getJSONObject(0).getString("name");
+                    // + " (" + globalizationApp.getLanguageValue("pt_" + curPlace.types[0]) + ")";
+                    
+                    /*articles.length(); // --> 2
+                    articles.getJSONObject(0) // get first article in the array
+                    articles.getJSONObject(0).names() // get first article keys [title,url,categories,tags]
+                    articles.getJSONObject(0).getString("url") // return an article url*/
+                    Log.d(TAG, "PLACE OK");
+                }else{
+                    result = curGlob.getValue(Globalization.INFO_UNAVAILABLE);;
+                    Log.d(TAG, "STRING to JSON FAILED");
+                }
+
+                
                 Log.d(TAG, "Http Response: " + response.toString());
-                Log.d(TAG, "PLACE OK");
-                return "PLACE OK";
+                
+                return result;
             } else {
                 Log.d(TAG, "PLACE FAIL");
                 return curGlob.getValue(Globalization.INFO_UNAVAILABLE);
@@ -1236,5 +1264,17 @@ public class LocationUpdateService extends Service implements LocationListener {
         protected void onPostExecute(Boolean result) {
             Log.d(TAG, "ShareCardTask#onPostExecture");
         }
+    }
+
+    private static String convertInputStreamToString(InputStream inputStream) throws IOException{
+        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+        String line = "";
+        String result = "";
+        while((line = bufferedReader.readLine()) != null)
+            result += line;
+ 
+        inputStream.close();
+        return result;
+ 
     }
 }
