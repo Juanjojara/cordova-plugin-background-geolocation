@@ -986,7 +986,7 @@ public class LocationUpdateService extends Service implements LocationListener {
 
             HttpGet request = new HttpGet(place_api_url);
   
-//            request.setHeader("Content-type", "application/json");
+            request.setHeader("Content-type", "application/json");
 
             Log.d(TAG, "Getting from " + request.getURI().toString());
             HttpResponse response = httpClient.execute(request);
