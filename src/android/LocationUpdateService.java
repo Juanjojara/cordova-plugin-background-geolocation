@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.net.URLEncoder
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -981,7 +982,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         Globalization curGlob = new Globalization(mContext);
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
-            String placesTypes = "airport|amusement_park|aquarium|art_gallery|bakery|bus_station|cafe|campground|church|city_hall|embassy|food|grocery_or_supermarket|gym|health|hindu_temple|library|local_government_office|lodging|mosque|movie_theater|museum|park|place_of_worship|post_office|restaurant|school|shopping_mall|spa|stadium|subway_station|synagogue|train_station|university|zoo";
+            String placesTypes = URLEncoder.encode("airport|amusement_park|aquarium|art_gallery|bakery|bus_station|cafe|campground|church|city_hall|embassy|food|grocery_or_supermarket|gym|health|hindu_temple|library|local_government_office|lodging|mosque|movie_theater|museum|park|place_of_worship|post_office|restaurant|school|shopping_mall|spa|stadium|subway_station|synagogue|train_station|university|zoo", "UTF-8");
             String place_api_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=50&types=" + placesTypes + "&key=AIzaSyAcMdSWYY56SKeMBIFtCHWnXXNfmn5tnj8";
 
             HttpGet request = new HttpGet(place_api_url);
