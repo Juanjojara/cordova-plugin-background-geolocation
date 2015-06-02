@@ -1010,8 +1010,10 @@ public class LocationUpdateService extends Service implements LocationListener {
                     JSONObject curPlace = places.getJSONObject(0);
                     
                     JSONArray curPlaceTypes = curPlace.getJSONArray("types");
+                    String curPlaceType = curPlaceTypes.getString(0);
+                    Log.d(TAG, "PLACE TYPE: " + curPlaceType);
                     // + " (" + globalizationApp.getLanguageValue("pt_" + curPlace.types[0]) + ")";
-                    result = curPlace.getString("name") + " (" + curGlob.getValue("pt_" + curPlaceTypes.getString(0)) + ")";
+                    result = curPlace.getString("name") + " (" + curGlob.getValuePlaceType("pt_" + curPlaceType) + ")";
                     //ADD TYPE OF PLACE AND ADD "IS NEAR"
 
 
