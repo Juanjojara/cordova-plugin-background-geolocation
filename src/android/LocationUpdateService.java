@@ -757,7 +757,8 @@ public class LocationUpdateService extends Service implements LocationListener {
                     Log.i(TAG, "Error getting Address");
                     return false;                    
                 }
-                String curInfo = getInfo(geoCard.getCreated());
+
+                String curInfo = getInfo(geoCard.getCreated(), geoCard.getLocation_level());
 
                 //Control to avoid creating redundant cards
                 SharedPreferences.Editor edit = pref.edit();
@@ -926,21 +927,27 @@ public class LocationUpdateService extends Service implements LocationListener {
         return currentNotId;
     }
 
-    private String getInfo(long cardTime){
+    private String getInfo(long cardTime, String location_setting) {
         //Function for defining user activity depending on the time of the day
         Date currentdate = new Date(cardTime);
         Globalization curGlob = new Globalization(mContext);
 
-        DateFormat df = new SimpleDateFormat("HH");
-        //String curInfo = "is in";
-        String curInfo = curGlob.getValue(Globalization.INFO_ISIN);
-        if (Integer.parseInt(df.format(currentdate)) <= 6){
-            //curInfo = "is sleeping";
-            curInfo = curGlob.getValue(Globalization.INFO_SLEEP);
-        } else if (Integer.parseInt(df.format(currentdate)) >= 12 && Integer.parseInt(df.format(currentdate)) <=14){
-            //curInfo = "is having lunch";
-            curInfo = curGlob.getValue(Globalization.INFO_LUNCH);
+        String curInfo = "";
+        if (location_level(location_setting) <=0){
+            curInfo = curGlob.getValue(Globalization.INFO_ISNEAR);
+        }else{
+            DateFormat df = new SimpleDateFormat("HH");
+            //String curInfo = "is in";
+            curInfo = curGlob.getValue(Globalization.INFO_ISIN);
+            if (Integer.parseInt(df.format(currentdate)) <= 6){
+                //curInfo = "is sleeping";
+                curInfo = curGlob.getValue(Globalization.INFO_SLEEP);
+            } else if (Integer.parseInt(df.format(currentdate)) >= 12 && Integer.parseInt(df.format(currentdate)) <=14){
+                //curInfo = "is having lunch";
+                curInfo = curGlob.getValue(Globalization.INFO_LUNCH);
+            }
         }
+
         return curInfo;
     }
 
@@ -1011,23 +1018,13 @@ public class LocationUpdateService extends Service implements LocationListener {
                     
                     JSONArray curPlaceTypes = curPlace.getJSONArray("types");
                     String curPlaceType = curPlaceTypes.getString(0);
-                    Log.d(TAG, "PLACE TYPE: " + curPlaceType);
-                    // + " (" + globalizationApp.getLanguageValue("pt_" + curPlace.types[0]) + ")";
                     result = curPlace.getString("name") + " (" + curGlob.getValuePlaceType("pt_" + curPlaceType) + ")";
                     //ADD TYPE OF PLACE AND ADD "IS NEAR"
-
-
-                    /*articles.length(); // --> 2
-                    articles.getJSONObject(0) // get first article in the array
-                    articles.getJSONObject(0).names() // get first article keys [title,url,categories,tags]
-                    articles.getJSONObject(0).getString("url") // return an article url*/
                     Log.d(TAG, "PLACE: " + result);
-                    Log.d(TAG, "PLACE OK");
                 }else{
                     result = curGlob.getValue(Globalization.INFO_UNAVAILABLE);
                     Log.d(TAG, "STRING to JSON FAILED");
                 }
-
                 
                 Log.d(TAG, "Http Response: " + response.toString());
                 

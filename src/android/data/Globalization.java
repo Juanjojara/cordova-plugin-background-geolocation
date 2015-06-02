@@ -16,6 +16,7 @@ public class Globalization {
 	public static final String INFO_ISIN = "info_isin";
 	public static final String INFO_LUNCH = "info_lunch";
 	public static final String INFO_SLEEP = "info_sleep";
+    public static final String INFO_ISNEAR = "info_isnear";
 	public static final String INFO_UNAVAILABLE = "info_unavailable";
 
     public static final String PT_AIRPORT = "pt_airport";
@@ -106,6 +107,9 @@ public class Globalization {
             case INFO_SLEEP:
                 result = "is sleeping";
                 break;
+            case INFO_ISNEAR:
+                result = "is near the";
+                break;
             case INFO_UNAVAILABLE:
                 result = "unavailable";
                 break;
@@ -136,6 +140,9 @@ public class Globalization {
                 break;
             case INFO_SLEEP:
                 result = "sta dormendo";
+                break;
+            case INFO_ISNEAR:
+                result = "e’ vicino a";
                 break;
             case INFO_UNAVAILABLE:
                 result = "Non disponibile";
@@ -168,6 +175,9 @@ public class Globalization {
             case INFO_SLEEP:
                 result = "está durmiendo";
                 break;
+            case INFO_ISNEAR:
+                result = "está cerca de";
+                break;
             case INFO_UNAVAILABLE:
                 result = "No disponible";
                 break;
@@ -199,6 +209,9 @@ public class Globalization {
             case INFO_SLEEP:
                 result = "сплю";
                 break;
+            case INFO_ISNEAR:
+                result = "рядом с";
+                break;
             case INFO_UNAVAILABLE:
                 result = "недоступен";
                 break;
@@ -229,6 +242,9 @@ public class Globalization {
                 break;
             case INFO_SLEEP:
                 result = "śpi";
+                break;
+            case INFO_ISNEAR:
+                result = "jest w pobliżu";
                 break;
             case INFO_UNAVAILABLE:
                 result = "niedostępny";
