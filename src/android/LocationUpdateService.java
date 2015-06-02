@@ -1007,9 +1007,14 @@ public class LocationUpdateService extends Service implements LocationListener {
                     String resultResponse = convertInputStreamToString(inputStream);
                     JSONObject json = new JSONObject(resultResponse); // convert String to JSONObject
                     JSONArray places = json.getJSONArray("results"); // get articles array
-                    result = places.getJSONObject(0).getString("name");
-                    // + " (" + globalizationApp.getLanguageValue("pt_" + curPlace.types[0]) + ")";
+                    JSONObject curPlace = places.getJSONObject(0);
                     
+                    JSONArray curPlaceTypes = curPlace.getJSONArray("types");
+                    // + " (" + globalizationApp.getLanguageValue("pt_" + curPlace.types[0]) + ")";
+                    result = curPlace.getString("name") + " (" + curGlob.getValue("pt_" + curPlaceTypes.getString(0)) + ")";
+                    //ADD TYPE OF PLACE AND ADD "IS NEAR"
+
+
                     /*articles.length(); // --> 2
                     articles.getJSONObject(0) // get first article in the array
                     articles.getJSONObject(0).names() // get first article keys [title,url,categories,tags]
@@ -1017,7 +1022,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                     Log.d(TAG, "PLACE: " + result);
                     Log.d(TAG, "PLACE OK");
                 }else{
-                    result = curGlob.getValue(Globalization.INFO_UNAVAILABLE);;
+                    result = curGlob.getValue(Globalization.INFO_UNAVAILABLE);
                     Log.d(TAG, "STRING to JSON FAILED");
                 }
 
