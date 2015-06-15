@@ -73,11 +73,11 @@ module.exports = {
             'setConfig',
             [config]);
     },
-   /**
+    /**
     * Returns current stationaryLocation if available.  null if not
     */
-   getStationaryLocation: function(success, failure) {
-       exec(success || function() {},
+    getStationaryLocation: function(success, failure) {
+        exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
             'getStationaryLocation',
