@@ -834,8 +834,8 @@ public class LocationUpdateService extends Service implements LocationListener {
             params_share.put("timestamp", geoCard.getCreated());
             Log.i(TAG, "info: " + geoCard.getInfo() + " - location: " + geoCard.getLocation());
 
-            StringEntity se = new StringEntity(params_share.toString());
-            //StringEntity se = new StringEntity(params.toString());
+            StringEntity se = new StringEntity(params_share.toString(), "UTF-8");
+            //form = new UrlEncodedFormEntity(nameValuePairs,"UTF-8");
             request.setEntity(se);
             request.setHeader("Content-type", "application/json");
 

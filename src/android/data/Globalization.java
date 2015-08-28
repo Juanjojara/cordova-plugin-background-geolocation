@@ -68,16 +68,16 @@ public class Globalization {
 		String result = "";
 		switch (langCode.toLowerCase()) {
 			case "it":
-                result = getValueIT(key);;
+                result = getValueIT(key);
                 break;
             case "ru":
-                result = getValueRU(key);;
+                result = getValueRU(key);
                 break;
             case "es":
-                result = getValueES(key);;
+                result = getValueES(key);
                 break;
             case "pl":
-                result = getValuePL(key);;
+                result = getValuePL(key);
                 break;
             default: 
                 result = getValueEN(key);
